@@ -1,0 +1,44 @@
+{
+    "description": "Text Condensation (German)",
+    "component": "com.sap.system.python3Operator",
+    "inports": [
+        {
+            "name": "articles",
+            "type": "message.dicts",
+            "description": "Message with body as dictionary."
+        },
+        {
+            "name": "disregards",
+            "type": "message.list",
+            "description": "Message with list of words to disregard. "
+        }
+    ],
+    "outports": [
+        {
+            "name": "log",
+            "type": "string",
+            "description": "Logging data"
+        },
+        {
+            "name": "uniquewords",
+            "type": "message.list",
+            "description": "Array of new unique words"
+        },
+        {
+            "name": "data",
+            "type": "message.dict",
+            "description": "Output List of index words"
+        }
+    ],
+    "config": {
+        "$type": "http://sap.com/vflow/textanalysis.text_condensation_g.configSchema.json",
+        "script": "file://text_condensation_g.py",
+        "debug_mode": true,
+        "nouns_only": true
+    },
+    "tags": {
+        "sdi_utils": "",
+        "nltk": ""
+    },
+    "iconsrc": "text_condensation_g.svg"
+}

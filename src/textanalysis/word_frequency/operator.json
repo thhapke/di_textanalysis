@@ -1,0 +1,46 @@
+{
+    "description": "Word Frequency",
+    "component": "com.sap.system.python3Operator",
+    "inports": [
+        {
+            "name": "blacklist",
+            "type": "message.list",
+            "description": "Message with body as dictionary."
+        },
+        {
+            "name": "articles",
+            "type": "message.dicts",
+            "description": "Message with body as dictionary."
+        }
+    ],
+    "outports": [
+        {
+            "name": "log",
+            "type": "string",
+            "description": "Logging data"
+        },
+        {
+            "name": "data",
+            "type": "message",
+            "description": "Output List of dicts with word frequency"
+        }
+    ],
+    "config": {
+        "$type": "http://sap.com/vflow/textanalysis.word_frequency.configSchema.json",
+        "script": "file://word_frequency.py",
+        "debug_mode": true,
+        "collect": true,
+        "limit": 100,
+        "date": "2020-02-24",
+        "days_into_past": "7",
+        "language": "None",
+        "media": "None",
+        "mode": "PROPN",
+        "max_word_len": 80
+    },
+    "tags": {
+        "sdi_utils": "",
+        "spacy": ""
+    },
+    "iconsrc": "word_frequency.svg"
+}

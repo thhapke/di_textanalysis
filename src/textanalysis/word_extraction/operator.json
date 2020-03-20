@@ -1,0 +1,50 @@
+{
+    "description": "Word Extraction",
+    "component": "com.sap.system.python3Operator",
+    "inports": [
+        {
+            "name": "blacklist",
+            "type": "message.list",
+            "description": "Message with body as dictionary."
+        },
+        {
+            "name": "lexicon",
+            "type": "message.table",
+            "description": "Message with body as lexicon."
+        },
+        {
+            "name": "articles",
+            "type": "message.dicts",
+            "description": "Message with body as dictionary."
+        }
+    ],
+    "outports": [
+        {
+            "name": "log",
+            "type": "string",
+            "description": "Logging data"
+        },
+        {
+            "name": "data",
+            "type": "message.table",
+            "description": "Output List of dicts with word frequency"
+        }
+    ],
+    "config": {
+        "$type": "http://sap.com/vflow/textanalysis.word_extraction.configSchema.json",
+        "script": "file://word_extraction.py",
+        "debug_mode": true,
+        "use_blacklist": true,
+        "use_lexicon": true,
+        "language": "None",
+        "mode": "PN",
+        "counter": true,
+        "max_word_len": 80,
+        "min_word_len": 2
+    },
+    "tags": {
+        "sdi_utils": "",
+        "spacy": ""
+    },
+    "iconsrc": "textcleansing.svg"
+}

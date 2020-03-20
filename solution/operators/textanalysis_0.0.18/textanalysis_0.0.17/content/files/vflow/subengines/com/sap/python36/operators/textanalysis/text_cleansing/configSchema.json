@@ -1,0 +1,38 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$id": "http://sap.com/vflow/textanalysis.text_cleansing.configSchema.json",
+    "type": "object",
+    "properties": {
+        "codelanguage": {
+            "type": "string"
+        },
+        "script": {
+            "type": "string"
+        },
+        "debug_mode": {
+            "title": "Debug mode",
+            "description": "Sending debug level information to log port",
+            "type": "boolean"
+        },
+        "language": {
+            "title": "Language",
+            "description": "Filter for language of media.",
+            "type": "string"
+        },
+        "mode": {
+            "title": "Mode",
+            "description": "Define the kind of data extraction. P=Proper Nouns, N=Nouns, X: Removing only stopwords.",
+            "type": "string"
+        },
+        "counter": {
+            "title": "Counter",
+            "description": "Returns counter if \"TRUE\" or a list of words.",
+            "type": "boolean"
+        },
+        "max_word_len": {
+            "title": "Maximum word lenght",
+            "description": "Maximum word lenght.",
+            "type": "integer"
+        }
+    }
+}

@@ -1,0 +1,35 @@
+{
+    "description": "Topic Indentification",
+    "component": "com.sap.system.python3Operator",
+    "inports": [
+        {
+            "name": "topic",
+            "type": "message.table",
+            "description": "Message with body as table."
+        }
+    ],
+    "outports": [
+        {
+            "name": "log",
+            "type": "string",
+            "description": "Logging data"
+        },
+        {
+            "name": "sql",
+            "type": "message",
+            "description": "message with body is sql and attributes contains the topic"
+        }
+    ],
+    "config": {
+        "$type": "http://sap.com/vflow/textanalysis.topic_identification.configSchema.json",
+        "script": "file://topic_identification.py",
+        "debug_mode": true,
+        "num_topics": 20,
+        "language_filter": "None",
+        "word_type_filter": "P"
+    },
+    "tags": {
+        "sdi_utils": ""
+    },
+    "iconsrc": "topic_identification.svg"
+}

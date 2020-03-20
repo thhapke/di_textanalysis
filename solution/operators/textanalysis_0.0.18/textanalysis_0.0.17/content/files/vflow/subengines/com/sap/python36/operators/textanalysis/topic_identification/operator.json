@@ -1,0 +1,32 @@
+{
+    "description": "Topic dispatcher",
+    "component": "com.sap.system.python3Operator",
+    "inports": [
+        {
+            "name": "topic",
+            "type": "message.table",
+            "description": "Message with body as table."
+        }
+    ],
+    "outports": [
+        {
+            "name": "log",
+            "type": "string",
+            "description": "Logging data"
+        },
+        {
+            "name": "sql",
+            "type": "message",
+            "description": "message with body is sql and attributes contains the topic"
+        }
+    ],
+    "config": {
+        "$type": "http://sap.com/vflow/textanalysis.topic_identification.configSchema.json",
+        "script": "file://topic_identification.py",
+        "debug_mode": true
+    },
+    "tags": {
+        "sdi_utils": ""
+    },
+    "iconsrc": "topic_identification.svg"
+}
