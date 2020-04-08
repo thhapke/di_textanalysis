@@ -1,11 +1,21 @@
 {
-    "description": "Text Cleansing",
+    "description": "Word Extraction",
     "component": "com.sap.system.python3Operator",
     "inports": [
         {
             "name": "blacklist",
             "type": "message.list",
             "description": "Message with body as dictionary."
+        },
+        {
+            "name": "keywords",
+            "type": "message.list",
+            "description": "Message with keywords as dictionary."
+        },
+        {
+            "name": "lexicon",
+            "type": "message.table",
+            "description": "Message with body as lexicon."
         },
         {
             "name": "articles",
@@ -27,12 +37,13 @@
     ],
     "config": {
         "$type": "http://sap.com/vflow/textanalysis.word_extraction.configSchema.json",
-        "script": "file://text_cleasing.py",
+        "script": "file://word_extraction.py",
         "debug_mode": true,
+        "use_blacklist": true,
         "language": "None",
         "mode": "PN",
-        "counter": true,
-        "max_word_len": 80
+        "max_word_len": 80,
+        "min_word_len": 3
     },
     "tags": {
         "sdi_utils": "",

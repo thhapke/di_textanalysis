@@ -2,14 +2,16 @@ import io
 import json
 import os
 import re
+import subprocess
+from datetime import datetime, timezone
 
 import sdi_utils.gensolution as gs
 import sdi_utils.set_logging as slog
 import sdi_utils.textfield_parser as tfp
 import sdi_utils.tprogress as tp
 
-language = {'Lefigaro': 'F', 'Lemonde': 'F', 'Spiegel': 'G', 'FAZ': 'G', 'Sueddeutsche': 'G', 'Elpais': 'S',
-            'Elmundo': 'S'}
+language = {'Lefigaro': 'FR', 'Lemonde': 'FR', 'Spiegel': 'DE', 'FAZ': 'DE', 'Sueddeutsche': 'DE', 'Elpais': 'ES',
+            'Elmundo': 'ES'}
 
 try:
     api
@@ -21,7 +23,7 @@ except NameError:
                 self.attributes = attributes
 
         def send(port, msg):
-            if port == outports[1]['name']:
+            if port == outports[2]['name']:
                 new_filename = os.path.basename(msg.attributes['storage.filename']).split('.')[0] + '-metadata.json'
                 with open(os.path.join('/Users/Shared/data/onlinemedia/prep_texts', new_filename), mode='w') as f:
                     f.write(json.dumps(msg.body, ensure_ascii=False))
@@ -36,7 +38,8 @@ except NameError:
             ## Meta data
             config_params = dict()
             tags = {'sdi_utils': '', 'nltk': ''}
-            version = "0.0.1"
+            version = "0.0.18"
+            operator_name = 'metadata_articles'
             operator_description = "Metadata Articles"
             operator_description_long = "Create metadata from articles."
             add_readme = dict()
@@ -46,15 +49,9 @@ except NameError:
                                            'description': 'Sending debug level information to log port',
                                            'type': 'boolean'}
 
-            num_important_words = 100
-            config_params['num_important_words'] = {'title': 'Number of important words',
-                                                    'description': 'Number of important words to be extracted.',
-                                                    'type': 'integer'}
 
-hash_dict = dict()
 
 def process(msg):
-    global hash_dict
 
     logger, log_stream = slog.set_logging('metadata_articles', loglevel=api.config.debug_mode)
     logger.info("Process started")
@@ -64,41 +61,52 @@ def process(msg):
     att_dict = msg.attributes
 
     metadata_articles = list()
+    articles_table = list()
 
     for index_article, article in enumerate(adict):
         metadata = {'media': article['media'], 'date': article['date'], 'language': language[article['media']], \
-                    'hash_text': article['hash_text'], 'url': article['url'], 'rubrics': article['rubrics'],
+                    'hash_text': article['hash_text'], 'url': article['url'][:255], 'rubrics': article['rubrics'],
                     'title': article['title'][:255]}
         metadata['num_characters'] = len(article['text'])
         metadata_articles.append(metadata)
-        #test if key already exist
-        if not metadata['hash_text'] in hash_dict :
-            hash_dict[metadata['hash_text']] = [metadata['date']]
-            metadata_articles.append(metadata)
-        else :
-            if metadata['date'] in hash_dict[metadata['hash_text']] :
-                logger.warning('Hash_text and date exist already: {} - {} - {} - {}'.\
-                               format(metadata['date'], metadata['media'],  metadata['title'],metadata['hash_text']))
-            else :
-                hash_dict[metadata['hash_text']].append(metadata['date'])
-                metadata_articles.append(metadata)
+        datea = datetime.strptime(article['date'], '%Y-%m-%d').replace(tzinfo=timezone.utc)
+        articles_table.append([article['media'],datea,language[article['media']],article['hash_text'],\
+                              article['url'][:255],article['rubrics'],article['title'][:255]])
+
+
+    table_att = {"columns": [
+        {"class": "string", "name": "MEDIA", "nullable": True,  "size": 80, "type": {"hana": "NVARCHAR"}},
+        {"class": "string", "name": "DATE", "nullable": False, "type": {"hana": "DATETIME"}},
+        {"class": "string", "name": "LANGUAGE", "nullable": True, "size": 2, "type": {"hana": "NVARCHAR"}},
+        {"class": "string", "name": "HASH_TEXT", "nullable": True, "type": {"hana": "INTEGER"}},
+        {"class": "string", "name": "URL", "nullable": True, "size": 255,"type": {"hana": "NVARCHAR"}},
+        {"class": "string", "name": "RUBRICS", "nullable": True, "size": 80,"type": {"hana": "NVARCHAR"}},
+        {"class": "string", "name": "TITLE", "nullable": True, "size": 255,"type": {"hana": "NVARCHAR"}}],
+              "name": "DIPROJECTS.ARTICLES_METADATA2", "version": 1}
 
     logger.debug('Process ended, articles processed {}  - {}  '.format(len(adict), time_monitor.elapsed_time()))
 
     att_dict['content'] = 'metadata for articles'
+    # JSON
     msg = api.Message(attributes=att_dict, body=metadata_articles)
+    api.send(outports[2]['name'], msg)
+    # TABLE
+    att_dict['table'] = table_att
+    msg = api.Message(attributes=att_dict, body=articles_table)
     api.send(outports[1]['name'], msg)
+
     api.send(outports[0]['name'], log_stream.getvalue())
 
 
 inports = [{'name': 'articles', 'type': 'message.dicts', "description": "Message with body as dictionary."}]
 outports = [{'name': 'log', 'type': 'string', "description": "Logging data"},
+            {'name': 'table', 'type': 'message.table', "description": "table of metadata arcticles"},
             {'name': 'data', 'type': 'message', "description": "Output metadata of articles"}]
 
 api.set_port_callback(inports[0]['name'], process)
 
 
-def main():
+def test_operator():
     config = api.config
     config.debug_mode = True
     config.num_important_words = 100

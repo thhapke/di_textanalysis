@@ -1,0 +1,38 @@
+{
+    "description": "Sentiment Analysis",
+    "component": "com.sap.system.python3Operator",
+    "inports": [
+        {
+            "name": "articles",
+            "type": "message.dicts",
+            "description": "Message with body as dictionary "
+        }
+    ],
+    "outports": [
+        {
+            "name": "log",
+            "type": "string",
+            "description": "Logging data"
+        },
+        {
+            "name": "table",
+            "type": "message.table",
+            "description": "table of sentiments arcticles"
+        },
+        {
+            "name": "data",
+            "type": "message",
+            "description": "Output List of sentiment records"
+        }
+    ],
+    "config": {
+        "$type": "http://sap.com/vflow/textanalysis.sentiment_analysis.configSchema.json",
+        "script": "file://sentiment_analysis.py",
+        "debug_mode": true
+    },
+    "tags": {
+        "sdi_utils": "",
+        "textblob": ""
+    },
+    "iconsrc": "sentiment.svg"
+}

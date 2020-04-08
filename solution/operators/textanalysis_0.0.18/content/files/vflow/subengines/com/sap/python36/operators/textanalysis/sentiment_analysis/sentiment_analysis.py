@@ -3,6 +3,7 @@ import json
 import os
 import re
 import pickle
+import subprocess
 
 
 from textblob import TextBlob, Blobber
@@ -47,7 +48,8 @@ except NameError:
             ## Meta data
             config_params = dict()
             tags = {'sdi_utils': '','textblob':''}
-            version = "0.0.1"
+            version = "0.0.18"
+            operator_name = "sentiment_analysis"
             operator_description = "Sentiment Analysis"
             operator_description_long = "Sentiment Analysis using lexicographic approach. "
             add_readme = dict()
@@ -97,6 +99,7 @@ def process(msg):
     att_dict['operator'] = operator_name
 
     sentiments_list = list()
+    sentiments_table = list()
     media_set = set()
     for article in article_list:
         media_set.add(article['media'])
@@ -111,23 +114,37 @@ def process(msg):
 
         polarity, subjectivity =  get_article_sentiment(article)
 
-        sentiments_list.append({'DATE': article['date'], 'MEDIA': article['media'],'HASH_TEXT': article['hash_text'],\
-                                'POLARITY': polarity, 'SUBJECTIVITY': subjectivity})
+        sentiments_list.append({'HASH_TEXT': article['hash_text'],'POLARITY': polarity, 'SUBJECTIVITY': subjectivity})
+        sentiments_table.append([article['hash_text'],polarity,subjectivity])
+
 
     logger.debug('Process ended, analysed media: {} - article sentiments analysed {}  - {}'.format(str(media_set), len(sentiments_list),\
                                                                                       time_monitor.elapsed_time()))
 
+
+    table_att = {"columns": [
+        {"class": "string", "name": "HASH_TEXT", "nullable": False, "type": {"hana": "INTEGER"}},
+        {"class": "string", "name": "POLARITY", "nullable": True,"type": {"hana": "DOUBLE"}},
+        {"class": "string", "name": "SUBJECTIVITY", "nullable": True, "type": {"hana": "DOUBLE"}}],
+              "name": "DIPROJECTS.SENTIMENTS", "version": 1}
+
     api.send(outports[0]['name'], log_stream.getvalue())
-    api.send(outports[1]['name'], api.Message(attributes=att_dict, body=sentiments_list))
+
+    api.send(outports[2]['name'], api.Message(attributes=att_dict, body=sentiments_list))
+
+    att_dict['table'] = table_att
+    msg = api.Message(attributes=att_dict, body=sentiments_table)
+    api.send(outports[1]['name'], msg)
 
 
 inports = [{'name': 'articles', 'type': 'message.dicts', "description": "Message with body as dictionary "}]
-outports = [{'name': 'log', 'type': 'string', "description": "Logging data"}, \
+outports = [{'name': 'log', 'type': 'string', "description": "Logging data"},
+            {'name': 'table', 'type': 'message.table', "description": "table of sentiments arcticles"},             \
             {'name': 'data', 'type': 'message', "description": "Output List of sentiment records"}]
 
 api.set_port_callback(inports[0]['name'], process)
 
-def main():
+def test_operator():
     config = api.config
     config.debug_mode = True
     api.set_config(config)

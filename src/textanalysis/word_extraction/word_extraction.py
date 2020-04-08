@@ -17,10 +17,13 @@ import sdi_utils.tprogress as tp
 media_languages = {'Lefigaro': 'FR', 'Lemonde': 'FR', 'Spiegel': 'DE', 'FAZ': 'DE', 'Sueddeutsche': 'DE',
                    'Elpais': 'ES',
                    'Elmundo': 'ES'}
+
+
 supported_languages = ['DE', 'EN', 'ES', 'FR']
 lexicon_languages = {lang: False for lang in supported_languages}
-supported_word_types = 'PNXL'
+supported_word_types = 'PNXLK'
 
+# ensure the models are downloaded in the first place by 'python -m spacy download <language_model>'
 language_models = {'EN': 'en_core_web_sm', 'DE': 'de_core_news_sm', 'FR': 'fr_core_news_sm', 'ES': 'es_core_news_sm',
                    'IT': 'it_core_news_sm', 'LT': 'lt_core_news_sm', 'NB': 'nb_core_news_sm', 'nl': 'nl_core_news_sm',
                    'PT': 'pt_core_news_sm'}
@@ -71,7 +74,7 @@ except NameError:
             ## Meta data
             config_params = dict()
             tags = {'sdi_utils': '', 'spacy': ''}
-            version = "0.0.1"
+            version = "0.0.18"
             operator_name = "word_extraction"
             operator_description = "Word Extraction"
             operator_description_long = "Extracts words from text for further analysis."
@@ -87,11 +90,6 @@ except NameError:
                                               'description': 'Use the blacklist for omitting words.',
                                               'type': 'boolean'}
 
-            use_lexicon = True
-            config_params['use_lexicon'] = {'title': 'Use lexicon',
-                                            'description': 'Use the lexicon for checking if word is in lexicon.',
-                                            'type': 'boolean'}
-
             language = 'None'
             config_params['language'] = {'title': 'Language', 'description': 'Filter for language of media.',
                                          'type': 'string'}
@@ -101,22 +99,19 @@ except NameError:
                                      'description': 'Define the kind of data extraction. P=Proper Nouns, '
                                                     'N=Nouns, X: Removing only stopwords.', 'type': 'string'}
 
-            counter = True
-            config_params['counter'] = {'title': 'Counter',
-                                        'description': 'Returns counter if \"TRUE\" or a list of words.', \
-                                        'type': 'boolean'}
-
             max_word_len = 80
             config_params['max_word_len'] = {'title': 'Maximum word lenght', 'description': 'Maximum word length.',
                                              'type': 'integer'}
 
-            min_word_len = 2
+            min_word_len = 3
             config_params['min_word_len'] = {'title': 'Minimum word length', 'description': 'Minimum word length.',
                                              'type': 'integer'}
 
 # global articles
 blacklist = list()
+keywords = list()
 lexicon = None
+lexicon_stem = None
 last_msg = None
 hash_list = list()
 operator_name = 'word_extraction'
@@ -132,10 +127,21 @@ def setup_blacklist(msg):
     api.send(outports[0]['name'], log_stream.getvalue())
     process(None)
 
+def setup_keywords(msg):
+    logger, log_stream = slog.set_logging(operator_name, api.config.debug_mode)
+    global keywords
+    logger.info('Set keywords')
+    logger.debug('Attributes: {}'.format(msg.attributes))
+    logger.debug('Data: {}'.format(msg.body))
+    keywords = msg.body
+    api.send(outports[0]['name'], log_stream.getvalue())
+    process(None)
+
+
 
 def setup_lexicon(msg):
     logger, log_stream = slog.set_logging(operator_name, api.config.debug_mode)
-    global lexicon, lexicon_languages
+    global lexicon, lexicon_languages, lexicon_stem
     logger.info('Set lexicon')
     logger.debug('Attributes: {}'.format(msg.attributes))
     logger.debug('Data: {}'.format(msg.body))
@@ -146,21 +152,37 @@ def setup_lexicon(msg):
         api.send(outports[0]['name'], log_stream.getvalue())
         return None
 
-    lexicon = {c: dict() for c in header[3:]}
+    lexicon = {c: dict() for c in header[1:]}
+    lexicon_stem = {c: dict() for c in header[1:]}
     for r in msg.body:
-        for i, lang in enumerate(header[3:]):
-            lang_words = r[i + 3].split()
-            lang_words_dict = dict.fromkeys(lang_words, r[2])
-            lexicon[lang].update(lang_words_dict)
-    for lang in header[3:]:
+        for i, lang in enumerate(header[1:]):
+            lang_words = r[i + 1].split()
+            lw = list()
+            lws = list()
+            for w in lang_words :
+                if w[-1] == '*' :
+                    lws.append(w[:-1])
+                else :
+                    lw.append(w)
+            if lw :
+                lw_dict = dict.fromkeys(lw, r[0])
+                lexicon[lang].update(lw_dict)
+            if lws :
+                lws_dict = dict.fromkeys(lws, r[0])
+                lexicon_stem[lang].update(lws_dict)
+
+    for lang in header[1:]:
         lexicon_languages[lang] = True
     api.send(outports[0]['name'], log_stream.getvalue())
     process(None)
 
 
 # Checks for setup
-def check_for_setup(logger, msg, use_blacklist=True, use_lexicon=False):
-    global blacklist, lexicon, last_msg
+def check_for_setup(logger, msg, mode, use_blacklist = False) :
+    global blacklist, keywords, lexicon, last_msg
+
+    use_keywords = True if 'K' in mode  else False
+    use_lexicon = True if 'L' in mode else False
 
     logger.info("Check setup")
     # Case: setupdate, check if all has been set
@@ -170,8 +192,9 @@ def check_for_setup(logger, msg, use_blacklist=True, use_lexicon=False):
             logger.info('Prerequisite message has been set, but waiting for data')
             return None
         else:
-            if len(blacklist) == 0 or lexicon == None:
-                logger.info("Setup not complete -  blacklist: {}   lexicon: {}".format(len(blacklist, len(lexicon))))
+            if len(blacklist) == 0 or lexicon == None or len(keywords) == 0  :
+                logger.info("Setup not complete -  blacklist: {} keywords: {}  lexicon: {}".\
+                            format(len(blacklist, len(keywords), len(lexicon))))
                 return None
             else:
                 logger.info("Last msg list has been retrieved")
@@ -186,9 +209,12 @@ def check_for_setup(logger, msg, use_blacklist=True, use_lexicon=False):
             last_msg.body.extend(msg.body)
 
         # check if data msg should be returned or none if setup is not been done
-        if (len(blacklist) == 0 and use_blacklist == True) or (lexicon == None and use_lexicon == True):
+        if (len(blacklist) == 0  and use_blacklist == True) or \
+            (len(keywords) == 0 and  use_keywords == True) or \
+            (lexicon == None and use_lexicon == True):
             len_lex = 0 if lexicon == None else len(lexicon)
-            logger.info("Setup not complete -  blacklist: {}   lexicon: {}".format(len(blacklist), len_lex))
+            logger.info("Setup not complete -  blacklist: {}  keywords: {}  lexicon: {}".\
+                        format(len(blacklist), len(keywords), len_lex))
             return None
         else:
             logger.info('Setup is been set. Saved msg retrieved.')
@@ -204,7 +230,8 @@ def process(msg):
 
     logger, log_stream = slog.set_logging(operator_name, api.config.debug_mode)
 
-    msg = check_for_setup(logger, msg, use_blacklist=api.config.use_blacklist, use_lexicon=api.config.use_lexicon)
+    # Check if setup complete
+    msg = check_for_setup(logger, msg, mode=api.config.mode, use_blacklist=api.config.use_blacklist)
     if not msg:
         api.send(outports[0]['name'], log_stream.flush())
         return 0
@@ -219,6 +246,12 @@ def process(msg):
 
     if not mode or not any(m in mode for m in supported_word_types):
         raise Exception('Mode is mandatory parameter and valid values are: {}'.format(supported_word_types))
+
+    use_keywords = True if 'K' in mode  else False
+    use_lexicon = True if 'L' in mode else False
+    use_blacklist = api.config.use_blacklist
+
+    logger.info('Usage:  keywords: {}  lexicon: {}  blacklist: {} '.format(use_keywords, use_lexicon, use_blacklist))
 
     article_words = list()
     article_count = 0
@@ -250,9 +283,12 @@ def process(msg):
                 words['N'] = [token.lemma_[:api.config.max_word_len] for token in doc if token.pos_ == 'NOUN']
             if 'X' in api.config.mode:
                 words['X'] = [token.text[:api.config.max_word_len] for token in doc if not token.is_stop]
-            if api.config.use_lexicon and lexicon_languages[language]:
-                words['L'] = [lexicon[language][lw] for lw in lexicon[language] for token in doc if
-                              re.match(lw, token.lemma_, re.IGNORECASE)]
+            if use_keywords :
+                #words['K'] = [token.lemma_ for kw in keywords for token in doc if re.match(kw, token.lemma_)]
+                words['K'] = [token.lemma_ for kw in keywords for token in doc if kw == token.lemma]
+            if use_lexicon and lexicon_languages[language]:
+                words['L'] = [lexicon_stem[language][lw] for lw in lexicon_stem[language] for token in doc if re.match(lw, token.lemma_)]
+                words['L'] = [lexicon[language][lw] for lw in lexicon[language] for token in doc if lw == token.lemma]
 
         for m in words:
             # heuristics
@@ -265,12 +301,10 @@ def process(msg):
             # remove numbers and dates
             words[m] = [w for w in words[m] if not (re.findall('\d+[\.,]\d+', w) or re.findall('^\d+$', w))]
             # Remove blacklist words
-            if api.config.use_blacklist:
+            if use_blacklist:
                 words[m] = [w for w in words[m] if w not in blacklist]
-            if api.config.counter:
-                article_words.append([article['hash_text'], language, m, collections.Counter(words[m]).most_common()])
-            else:
-                article_words.append([article['hash_text'], language, m, words[m]])
+            article_words.append([article['hash_text'], language, m, collections.Counter(words[m]).most_common()])
+
 
     attributes = {
         "table": {"columns": [{"class": "string", "name": "HASH_TEXT", "nullable": True, "type": {"hana": "INTEGER"}},
@@ -290,26 +324,27 @@ def process(msg):
     api.send(outports[1]['name'], table_msg)
 
 
-inports = [{'name': 'blacklist', 'type': 'message.list', "description": "Message with body as dictionary."}, \
+inports = [{'name': 'blacklist', 'type': 'message.list', "description": "Message with body as dictionary."},
+           {'name': 'keywords', 'type': 'message.list', "description": "Message with keywords as dictionary."},\
            {'name': 'lexicon', 'type': 'message.table', "description": "Message with body as lexicon."}, \
            {'name': 'articles', 'type': 'message.dicts', "description": "Message with body as dictionary."}]
 outports = [{'name': 'log', 'type': 'string', "description": "Logging data"}, \
             {'name': 'data', 'type': 'message.table', "description": "Output List of dicts with word frequency"}]
 
 #api.set_port_callback(inports[0]['name'], setup_blacklist)
-#api.set_port_callback(inports[0]['name'], setup_lexicon)
-#api.set_port_callback(inports[1]['name'], process)
+#api.set_port_callback(inports[1]['name'], setup_keywords)
+#api.set_port_callback(inports[2]['name'], setup_lexicon)
+#api.set_port_callback(inports[3]['name'], process)
 
 
 def test_operator():
     config = api.config
     config.debug_mode = True
-    config.mode = 'PN'
+    config.mode = 'L'
     config.language = 'None'
     config.max_word_len = 80
     config.counter = True
     config.use_blacklist = True
-    config.use_lexicon = True
     config.min_word_len = 3
 
     api.set_config(config)
@@ -326,7 +361,16 @@ def test_operator():
     bl_msg = api.Message(attributes={'filename': bl_filename}, body=blacklist)
     setup_blacklist(bl_msg)
 
-
+    # KEYWORDS
+    kw_filename = '/Users/Shared/data/onlinemedia/repository/keywords.txt'
+    keywords = list()
+    with open(kw_filename, mode='r') as csv_file:
+        rows = csv.reader(csv_file, delimiter=',')
+        for r in rows:
+            keywords.append(r[0])
+        # print(csv_file.read())
+    kw_msg = api.Message(attributes={'filename': kw_filename}, body=keywords)
+    setup_keywords(kw_msg)
 
     in_dir = '/Users/Shared/data/onlinemedia/crawled_texts/'
     files_in_dir = [f for f in os.listdir(in_dir) if os.path.isfile(os.path.join(in_dir, f)) and re.match('Spieg.*', f)]
@@ -349,20 +393,19 @@ def test_operator():
         process(msg_data)
 
     # LEXICON
-    lex_filename = '/Users/Shared/data/onlinemedia/repository/lexicon2.csv'
+    lex_filename = '/Users/Shared/data/onlinemedia/repository/lexicon_march.csv'
     lexicon_list = list()
     with open(lex_filename, mode='r') as csv_file:
         rows = csv.reader(csv_file, delimiter=',')
         headers = next(rows, None)
         for r in rows:
-            r[3] = r[3].replace('*', '')  # only needed when lexicon in construction
+            #r[3] = r[3].replace('*', '')  # only needed when lexicon in construction
             lexicon_list.append(r)
     attributes = {"table": {"name": lex_filename, "version": 1, "columns": list()}}
     for h in headers:
         attributes["table"]["columns"].append({"name": h})
     lex_msg = api.Message(attributes=attributes, body=lexicon_list)
     setup_lexicon(lex_msg)
-
 
 
     # saving outcome as word index
@@ -387,9 +430,13 @@ def test_operator():
 
 if __name__ == '__main__':
     test_operator()
-    #gs.gensolution(os.path.realpath(__file__), api.config, inports, outports)
-    #subprocess.run(["vctl", "solution", "bundle", '/Users/d051079/OneDrive - SAP SE/GitHub/textanalysis/src',\
-     #                         "-t", 'textanalysis'])
+
+    if False :
+        gs.gensolution(os.path.realpath(__file__), api.config, inports, outports)
+        solution_name = api.config.operator_name+'_'+api.config.version
+        subprocess.run(["vctl", "solution", "bundle", '/Users/d051079/OneDrive - SAP SE/GitHub/di_textanalysis/solution/operators/textanalysis_0.0.1',\
+                                  "-t", solution_name])
+        subprocess.run(["mv", solution_name+'.zip', '../../../solution/operators'])
 
 
 

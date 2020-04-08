@@ -8,6 +8,11 @@
             "description": "Message with body as dictionary."
         },
         {
+            "name": "keywords",
+            "type": "message.list",
+            "description": "Message with keywords as dictionary."
+        },
+        {
             "name": "lexicon",
             "type": "message.table",
             "description": "Message with body as lexicon."
@@ -35,12 +40,10 @@
         "script": "file://word_extraction.py",
         "debug_mode": true,
         "use_blacklist": true,
-        "use_lexicon": true,
         "language": "None",
         "mode": "PN",
-        "counter": true,
         "max_word_len": 80,
-        "min_word_len": 2
+        "min_word_len": 3
     },
     "tags": {
         "sdi_utils": "",

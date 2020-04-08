@@ -19,11 +19,6 @@
             "description": "Use the blacklist for omitting words.",
             "type": "boolean"
         },
-        "use_lexicon": {
-            "title": "Use lexicon",
-            "description": "Use the lexicon for checking if word is in lexicon.",
-            "type": "boolean"
-        },
         "language": {
             "title": "Language",
             "description": "Filter for language of media.",
@@ -33,11 +28,6 @@
             "title": "Mode",
             "description": "Define the kind of data extraction. P=Proper Nouns, N=Nouns, X: Removing only stopwords.",
             "type": "string"
-        },
-        "counter": {
-            "title": "Counter",
-            "description": "Returns counter if \"TRUE\" or a list of words.",
-            "type": "boolean"
         },
         "max_word_len": {
             "title": "Maximum word lenght",

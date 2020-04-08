@@ -14,6 +14,11 @@
             "description": "Sending debug level information to log port",
             "type": "boolean"
         },
+        "use_blacklist": {
+            "title": "Use blacklist",
+            "description": "Use the blacklist for omitting words.",
+            "type": "boolean"
+        },
         "language": {
             "title": "Language",
             "description": "Filter for language of media.",
@@ -24,14 +29,14 @@
             "description": "Define the kind of data extraction. P=Proper Nouns, N=Nouns, X: Removing only stopwords.",
             "type": "string"
         },
-        "counter": {
-            "title": "Counter",
-            "description": "Returns counter if \"TRUE\" or a list of words.",
-            "type": "boolean"
-        },
         "max_word_len": {
             "title": "Maximum word lenght",
-            "description": "Maximum word lenght.",
+            "description": "Maximum word length.",
+            "type": "integer"
+        },
+        "min_word_len": {
+            "title": "Minimum word length",
+            "description": "Minimum word length.",
             "type": "integer"
         }
     }

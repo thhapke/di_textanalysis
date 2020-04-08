@@ -15,6 +15,11 @@
             "description": "Logging data"
         },
         {
+            "name": "table",
+            "type": "message.table",
+            "description": "table of sentiments arcticles"
+        },
+        {
             "name": "data",
             "type": "message",
             "description": "Output List of sentiment records"
