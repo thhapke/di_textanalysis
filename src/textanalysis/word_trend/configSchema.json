@@ -1,0 +1,43 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$id": "http://sap.com/vflow/textanalysis.word_trend.configSchema.json",
+    "type": "object",
+    "properties": {
+        "codelanguage": {
+            "type": "string"
+        },
+        "script": {
+            "type": "string"
+        },
+        "debug_mode": {
+            "title": "Debug mode",
+            "description": "Sending debug level information to log port",
+            "type": "boolean"
+        },
+        "language": {
+            "title": "Language",
+            "description": "Filter for language of media.",
+            "type": "string"
+        },
+        "type": {
+            "title": "Type",
+            "description": "Define the kind of data extraction. P=Proper Nouns, N=Nouns, X: Removing only stopwords.",
+            "type": "string"
+        },
+        "min_count": {
+            "title": "Minimum number of occurances",
+            "description": "Minimum number of occurances of words.",
+            "type": "integer"
+        },
+        "regr_ratio": {
+            "title": "Ratio for how many top words to calculate the trend",
+            "description": "Ratio for how many top words to calculate the trend",
+            "type": "number"
+        },
+        "periods_into_past": {
+            "title": "Periods into past",
+            "description": "Periods into the past",
+            "type": "string"
+        }
+    }
+}

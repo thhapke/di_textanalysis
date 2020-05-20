@@ -113,7 +113,7 @@ keywords = list()
 lexicon = None
 lexicon_stem = None
 last_msg = None
-hash_list = list()
+id_set = list()
 operator_name = 'word_extraction'
 
 
@@ -226,7 +226,7 @@ def check_for_setup(logger, msg, mode, use_blacklist = False) :
 def process(msg):
     global blacklist
     global last_msg
-    global hash_list
+    global id_set
 
     logger, log_stream = slog.set_logging(operator_name, api.config.debug_mode)
 
@@ -240,6 +240,7 @@ def process(msg):
     time_monitor = tp.progress()
 
     adict = msg.body
+    att_dict = msg.attributes
 
     language_filter = tfp.read_value(api.config.language)
     mode = tfp.read_value(api.config.mode)
@@ -306,20 +307,18 @@ def process(msg):
             article_words.append([article['hash_text'], language, m, collections.Counter(words[m]).most_common()])
 
 
-    attributes = {
-        "table": {"columns": [{"class": "string", "name": "HASH_TEXT", "nullable": True, "type": {"hana": "INTEGER"}},
+    att_dict['table'] =  {"columns": [{"class": "string", "name": "HASH_TEXT", "nullable": True, "type": {"hana": "INTEGER"}},
                               {"class": "string", "name": "LANGUAGE", "nullable": True, "size": 2,
                                "type": {"hana": "NVARCHAR"}},
                               {"class": "string", "name": "TYPE", "nullable": True, "size": 1,
                                "type": {"hana": "NVARCHAR"}},
                               {"class": "string", "name": "WORDS", "nullable": True, "type": {"hana": "ARRAY"}}],
-                  "name": "DIPROJECTS.WORD_INDEX", "version": 1},
-        "storage.filename": msg.attributes["storage.filename"]}
+                              "name": "DIPROJECTS.WORD_INDEX", "version": 1}
 
-    attributes['counter'] = 'Y' if api.config.counter else 'N'
+    att_dict['counter'] = 'Y' if api.config.counter else 'N'
 
-    table_msg = api.Message(attributes=attributes, body=article_words)
-    logger.info('File processed: {} #Articles: {} '.format(msg.attributes["storage.filename"], len(adict)))
+    table_msg = api.Message(attributes=att_dict, body=article_words)
+    logger.info('File processed: {} #Articles: {} '.format(att_dict['file']['path'], len(adict)))
     api.send(outports[0]['name'], log_stream.getvalue())
     api.send(outports[1]['name'], table_msg)
 
@@ -431,13 +430,12 @@ def test_operator():
 if __name__ == '__main__':
     test_operator()
 
-    if False :
+    if True :
+        subprocess.run(["rm",'-r','/Users/d051079/OneDrive - SAP SE/GitHub/di_textanalysis/solution/operators/textanalysis_' + api.config.version])
         gs.gensolution(os.path.realpath(__file__), api.config, inports, outports)
         solution_name = api.config.operator_name+'_'+api.config.version
-        subprocess.run(["vctl", "solution", "bundle", '/Users/d051079/OneDrive - SAP SE/GitHub/di_textanalysis/solution/operators/textanalysis_0.0.1',\
+        subprocess.run(["vctl", "solution", "bundle", '/Users/d051079/OneDrive - SAP SE/GitHub/di_textanalysis/solution/operators/textanalysis_0.0.18',\
                                   "-t", solution_name])
         subprocess.run(["mv", solution_name+'.zip', '../../../solution/operators'])
-
-
 
 

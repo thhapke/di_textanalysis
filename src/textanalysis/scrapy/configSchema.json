@@ -28,16 +28,6 @@
             "title": "Project Directory",
             "description": "Scrapy project directory on container",
             "type": "string"
-        },
-        "start_cmd": {
-            "title": "Start command",
-            "description": "Start command",
-            "type": "boolean"
-        },
-        "json_string_output": {
-            "title": "JSON String output",
-            "description": "Sends JSON string to <string> port",
-            "type": "boolean"
         }
     }
 }

@@ -46,7 +46,8 @@ except NameError:
             ## Meta data
             config_params = dict()
             tags = {'pandas': '', 'sdi_utils': ''}
-            version = "0.0.1"
+            version = "0.0.2"
+            operator_name = 'scrapy'
             operator_description = 'scrapy'
             operator_description_long = "Starts scrapy and sends output to data port as dictionary or as json string to\
 jsonstr port. Log output send to stderr(scrapy) to log port."
@@ -67,24 +68,7 @@ spider = [media]_spider.py', 'type': 'string'}
             project_dir = 'None'
             config_params['project_dir'] = {'title': 'Project Directory', 'description': \
                 'Scrapy project directory on container', 'type': 'string'}
-            start_cmd = False
-            config_params['start_cmd'] = {'title': 'Start command', 'description': \
-                'Start command', 'type': 'boolean'}
-            json_string_output = False
-            config_params['json_string_output'] = {'title': 'JSON String output', 'description': \
-                'Sends JSON string to <string> port', 'type': 'boolean'}
 
-inports = [{'name': 'spider', 'type': 'message', "description": "spider.py file"}, \
-           {'name': 'pipelines', 'type': 'message', "description": "pipelines.py file"}, \
-           {'name': 'items', 'type': 'message', "description": "pipelines.py file"}, \
-           {'name': 'middlewares', 'type': 'message', "description": "middlewares.py file"}, \
-           {'name': 'settings', 'type': 'message', "description": "settings.py file"}
-           ]
-
-outports = [{'name': 'log', 'type': 'string', "description": "logging"}, \
-            {'name': 'stderr', 'type': 'string', "description": "stderr"}, \
-            {'name': 'jsonstr', 'type': 'message', "description": "message with json string"}, \
-            {"name": "data", "type": "message.dicts", "description": "data"}]
 
 ###
 # Format output from captured scrape stdout
@@ -139,16 +123,29 @@ def process(msg1, msg2, msg3, msg4, msg5):
 
     new_file_list = []
     for msg in msg_list:
-        filename = msg.attributes["storage.filename"]
+        filename = os.path.basename(msg.attributes["file"]["path"])
+
         if filename == 'spider.py':
             filename = os.path.join(project_dir, 'spiders', filename)
         else:
             filename = os.path.join(project_dir, filename)
         # copy files to directories
-        with open(filename, 'wb') as fout:
-            logger.info('Write to filename (binary): {}'.format(filename))
-            fout.write(msg.body)
-            fout.close()
+        try:
+            with open(filename, 'wb') as fout:
+                logger.info('Write to filename (binary): {}'.format(filename))
+                fout.write(msg.body)
+                fout.close()
+        except IOError:
+            logger.warning('File not found: {}'.format(filename))
+            logger.debug('Current directory: {}'.format(os.getcwd()))
+            f = []
+            for (dirpath, dirnames, filenames) in os.walk('/home/onlinemedia/'):
+                f.extend(filenames)
+                break
+            logger.debug('Files under directory onlinemedia: {}'.format(f))
+            api.send(outports[0]['name'], log_stream.getvalue())
+            time.sleep(5)
+            exit(-1)
         new_file_list.append(filename)
 
     for f in new_file_list:
@@ -158,6 +155,7 @@ def process(msg1, msg2, msg3, msg4, msg5):
             logger.error('File does not exist: {}'.format(filename))
 
     api.send(outports[0]['name'], log_stream.getvalue())
+    log_stream.seek(0)
     log_stream.truncate(0)
 
     spiderlist = tfp.read_list(api.config.spider)
@@ -170,14 +168,13 @@ def process(msg1, msg2, msg3, msg4, msg5):
             cmd = ['scrapy', 'crawl', spider]
             logger.info('Start scrapy: {} ({}/{})'.format(cmd,i,num_spiders))
             api.send(outports[0]['name'], log_stream.getvalue())
+            log_stream.seek(0)
             log_stream.truncate(0)
             #proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd = scrapy_dir,universal_newlines=True)
-            proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=scrapy_dir,
-                                    universal_newlines=True)
+            proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=scrapy_dir,universal_newlines=True)
             #proc = subprocess.Popen(['python','/Users/Shared/data/onlinemedia/outputgen.py'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
             #print('CWD: {}'.format(os.getcwd()))
-
-            api.send(outports[1]['name'], proc.stderr)
+            # api.send(outports[1]['name'], proc.stderr)
 
             count_articles = 0
             articles_list = list()
@@ -199,17 +196,21 @@ def process(msg1, msg2, msg3, msg4, msg5):
             num_batches += 1
             attributes = { k:v for k,v in last_article.items() if k in ['website','date','columns']}
             attributes['filename'] = '{}_{}.json'.format(media,last_article['date'])
+            attributes['file'] = {'path' : os.path.join('/shared/onlinemedia_texts', attributes['filename'])}
+            attributes['batch'] = {'index': i, 'number': num_spiders, 'last' : False}
             attributes['batch.index'] = i
             attributes['batch.number'] = num_spiders
             if i+1 == num_spiders :
                 attributes['batch.last'] = True
+                attributes['batch']['last'] = True
             msg = api.Message(attributes=attributes, body=articles_list)
             api.send(outports[3]['name'], msg)
 
-            if api.config.json_string_output :
-                attributes['format'] = 'JSON String'
-                msg = api.Message(attributes=attributes, body=json.dumps(articles_list,ensure_ascii=False,indent=4))
-                api.send(outports[2]['name'], msg)
+            attributes['format'] = 'JSON String'
+            if i+1 == len(spiderlist) :
+                attributes['message.lastBatch'] = True
+            msg = api.Message(attributes=attributes, body=json.dumps(articles_list,ensure_ascii=False,indent=4))
+            api.send(outports[2]['name'], msg)
 
         logger.info('Spider completed: {} - #articles: {}'.format(spider,count_articles))
         num_all_articles += count_articles
@@ -220,40 +221,58 @@ def process(msg1, msg2, msg3, msg4, msg5):
     api.send(outports[0]['name'], log_stream.getvalue())
     return 0
 
+inports = [{'name': 'spider', 'type': 'message.file', "description": "spider.py file"}, \
+           {'name': 'pipelines', 'type': 'message.file', "description": "pipelines.py file"}, \
+           {'name': 'items', 'type': 'message.file', "description": "pipelines.py file"}, \
+           {'name': 'middlewares', 'type': 'message.file', "description": "middlewares.py file"}, \
+           {'name': 'settings', 'type': 'message.file', "description": "settings.py file"}
+           ]
+
+outports = [{'name': 'log', 'type': 'string', "description": "logging"}, \
+            {'name': 'stderr', 'type': 'string', "description": "stderr"}, \
+            {'name': 'jsonstr', 'type': 'message.file', "description": "message with json string"}, \
+            {"name": "data", "type": "message.dicts", "description": "data"}]
 
 #api.set_port_callback([inports[0]['name'], inports[1]['name'], inports[2]['name'], inports[3]['name'], inports[4]['name']], process)
 
 
-def main():
+def test_operator():
     #print('CWD: {}'.format(os.getcwd()))
     config = api.config
     config.debug_mode = True
     config.scrapy_dir = '/Users/d051079/OneDrive - SAP SE/GitHub/Docker/scrapy/onlinemedia'
-    #config.spider = 'Spiegel_spider,FAZ_spider, Sueddeutsche_spider, Elpais_spider, Elmundo_spider, Lefigaro_spider, Lemonde_spider'
-    config.spider = 'Elpais_spider'
+    config.spider = 'Spiegel_spider,FAZ_spider, Sueddeutsche_spider, Elpais_spider, Elmundo_spider, Lefigaro_spider, Lemonde_spider'
+    #config.spider = 'Elpais_spider'
     config.project_dir = 'onlinemedia'
     config.json_string_output = True
     config.start_cmd = True
 
     items_b = open('/Users/d051079/OneDrive - SAP SE/GitHub/Docker/scrapy/source_files/items.py', mode='rb').read()
-    items_msg = api.Message(attributes={'storage.filename': 'items.py'}, body=items_b)
+    items_msg = api.Message(attributes={'file':{'path': 'items.py'}}, body=items_b)
 
     spiders_b = open('/Users/d051079/OneDrive - SAP SE/GitHub/Docker/scrapy/source_files/spider.py', mode='rb').read()
-    spiders_msg = api.Message(attributes={'storage.filename': 'spider.py'}, body=spiders_b)
+    spiders_msg = api.Message(attributes={'file':{'path': 'spider.py'}}, body=spiders_b)
 
     middlewares_b = open('/Users/d051079/OneDrive - SAP SE/GitHub/Docker/scrapy/source_files/middlewares.py',mode='rb').read()
-    middlewares_msg = api.Message(attributes={'storage.filename': 'middlewares.py'}, body=middlewares_b)
+    middlewares_msg = api.Message(attributes={'file':{'path': 'middlewares.py'}}, body=middlewares_b)
 
     pipelines_b = open('/Users/d051079/OneDrive - SAP SE/GitHub/Docker/scrapy/source_files/pipelines.py',mode='rb').read()
-    pipelines_msg = api.Message(attributes={'storage.filename': 'pipelines.py'}, body=pipelines_b)
+    pipelines_msg = api.Message(attributes={'file':{'path': 'pipelines.py'}}, body=pipelines_b)
 
     settings_b = open('/Users/d051079/OneDrive - SAP SE/GitHub/Docker/scrapy/source_files/settings.py',mode='rb').read()
-    settings_msg = api.Message(attributes={'storage.filename': 'settings.py'}, body=settings_b)
+    settings_msg = api.Message(attributes={'file':{'path': 'settings.py'}}, body=settings_b)
 
     api.call(config, items_msg, settings_msg, spiders_msg, middlewares_msg, pipelines_msg)
 
 
 if __name__ == '__main__':
-    main()
-
-
+    #test_operator()
+    if True:
+        subprocess.run(["rm", '-r',
+                        '/Users/d051079/OneDrive - SAP SE/GitHub/di_textanalysis/solution/operators/textanalysis_' + api.config.version])
+        gs.gensolution(os.path.realpath(__file__), api.config, inports, outports)
+        solution_name = api.config.operator_name + '_' + api.config.version
+        subprocess.run(["vctl", "solution", "bundle",
+                        '/Users/d051079/OneDrive - SAP SE/GitHub/di_textanalysis/solution/operators/textanalysis_' + api.config.version, \
+                        "-t", solution_name])
+        subprocess.run(["mv", solution_name + '.zip', '/Users/d051079/OneDrive - SAP SE/GitHub/di_textanalysis/solution/operators'])

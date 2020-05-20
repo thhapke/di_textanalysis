@@ -1,0 +1,33 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$id": "http://sap.com/vflow/textanalysis.word_regex_cleansing.configSchema.json",
+    "type": "object",
+    "properties": {
+        "codelanguage": {
+            "type": "string"
+        },
+        "script": {
+            "type": "string"
+        },
+        "debug_mode": {
+            "title": "Debug mode",
+            "description": "Sending debug level information to log port",
+            "type": "boolean"
+        },
+        "test_mode": {
+            "title": "Test mode",
+            "description": "Checking only on regex but not sending DELETE sql",
+            "type": "boolean"
+        },
+        "word_type": {
+            "title": "Word type",
+            "description": "Setting word type selection for delete",
+            "type": "string"
+        },
+        "patterns": {
+            "title": "Regular expression patterns",
+            "description": "Regular expression patterns",
+            "type": "string"
+        }
+    }
+}

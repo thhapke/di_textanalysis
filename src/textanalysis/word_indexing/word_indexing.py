@@ -59,18 +59,18 @@ def process(msg):
     for article in articles :
         word_index.extend([[article[0], article[1], article[2], w[0],w[1]] for w in article[3]])
 
-    attributes = {
-        "table": {"columns": [{"class": "string", "name": "HASH_TEXT", "nullable": True, "type": {"hana": "INTEGER"}},
+    att_dict = msg.attributes
+    att_dict['table'] = {"columns": [{"class": "string", "name": "HASH_TEXT", "nullable": True, "type": {"hana": "INTEGER"}},
                               {"class": "string", "name": "LANGUAGE", "nullable": True, "size": 2,"type": {"hana": "NVARCHAR"}},
                               {"class": "string", "name": "TYPE", "nullable": True, "size": 1,"type": {"hana": "NVARCHAR"}},
                               {"class": "string", "name": "WORD", "nullable": True, "size": 80,"type": {"hana": "NVARCHAR"}},
                               {"class": "string", "name": "COUNT", "nullable": True, "type": {"hana": "INTEGER"}}],
-                  "name": "DIPROJECTS.WORD_INDEX3", "version": 1}}
+                         "name": "DIPROJECTS.WORD_INDEX", "version": 1}
 
     logger.debug('Process ended, articles processed {}  - {}  '.format(len(articles), time_monitor.elapsed_time()))
     api.send(outports[0]['name'], log_stream.getvalue())
 
-    msg = api.Message(attributes=attributes,body=word_index)
+    msg = api.Message(attributes=att_dict,body=word_index)
     api.send(outports[1]['name'], msg)
 
 

@@ -1,11 +1,11 @@
 {
-    "description": "Metadata Articles",
+    "description": "Text Sentiment Analysis",
     "component": "com.sap.system.python3Operator",
     "inports": [
         {
-            "name": "articles",
+            "name": "texts",
             "type": "message.DataFrame",
-            "description": "Message with body as DataFrame."
+            "description": "DataFrame with texts"
         }
     ],
     "outports": [
@@ -17,17 +17,17 @@
         {
             "name": "data",
             "type": "message.DataFrame",
-            "description": "Output metadata of articles"
+            "description": "data of sentiments"
         }
     ],
     "config": {
-        "$type": "http://sap.com/vflow/textanalysis.metadata_articles.configSchema.json",
-        "script": "file://metadata_articles.py",
+        "$type": "http://sap.com/vflow/textanalysis.text_sentiment.configSchema.json",
+        "script": "file://text_sentiment.py",
         "debug_mode": true
     },
     "tags": {
         "sdi_utils": "",
-        "nltk": ""
+        "textblob": ""
     },
-    "iconsrc": "metadata_articles.svg"
+    "iconsrc": "sentiment.svg"
 }

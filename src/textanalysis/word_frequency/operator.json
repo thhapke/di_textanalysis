@@ -1,11 +1,11 @@
 {
-    "description": "Metadata Articles",
+    "description": "Word Frequency",
     "component": "com.sap.system.python3Operator",
     "inports": [
         {
-            "name": "articles",
+            "name": "words",
             "type": "message.DataFrame",
-            "description": "Message with body as DataFrame."
+            "description": "Message table."
         }
     ],
     "outports": [
@@ -17,17 +17,19 @@
         {
             "name": "data",
             "type": "message.DataFrame",
-            "description": "Output metadata of articles"
+            "description": "Table after regex"
         }
     ],
     "config": {
-        "$type": "http://sap.com/vflow/textanalysis.metadata_articles.configSchema.json",
-        "script": "file://metadata_articles.py",
-        "debug_mode": true
+        "$type": "http://sap.com/vflow/textanalysis.word_frequency.configSchema.json",
+        "script": "file://word_frequency.py",
+        "debug_mode": true,
+        "word_types": "PROPN",
+        "language_filter": "None"
     },
     "tags": {
         "sdi_utils": "",
-        "nltk": ""
+        "pandas": ""
     },
-    "iconsrc": "metadata_articles.svg"
+    "iconsrc": "word_frequency.svg"
 }

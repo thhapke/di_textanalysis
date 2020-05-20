@@ -1,0 +1,35 @@
+{
+    "description": "Word cleansing with regular expressions",
+    "component": "com.sap.system.python3Operator",
+    "inports": [
+        {
+            "name": "words",
+            "type": "message.table",
+            "description": "Message table."
+        }
+    ],
+    "outports": [
+        {
+            "name": "log",
+            "type": "string",
+            "description": "Logging data"
+        },
+        {
+            "name": "data",
+            "type": "message",
+            "description": "Output List of dicts with word frequency"
+        }
+    ],
+    "config": {
+        "$type": "http://sap.com/vflow/textanalysis.word_regex_cleansing.configSchema.json",
+        "script": "file://word_regex_cleansing.py",
+        "debug_mode": true,
+        "test_mode": false,
+        "word_type": "P",
+        "patterns": "\"\\d{2}:\\d{2}:\\d{2}\",\"\\d{3}-\""
+    },
+    "tags": {
+        "sdi_utils": ""
+    },
+    "iconsrc": "regex_cleansing.svg"
+}
