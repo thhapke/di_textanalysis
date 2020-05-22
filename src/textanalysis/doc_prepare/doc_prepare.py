@@ -52,12 +52,12 @@ except NameError:
                                            'description': 'Sending debug level information to log port',
                                            'type': 'boolean'}
 
-            text_column = 'TEXT'
+            text_column = 'text'
             config_params['text_column'] = {'title': 'TEXT Column',
                                            'description': 'Name of incoming text column',
                                            'type': 'string'}
 
-            id_column = 'ID'
+            id_column = 'text_id'
             config_params['id_column'] = {'title': 'ID Column',
                                            'description': 'Name of incoming id column',
                                            'type': 'string'}

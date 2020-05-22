@@ -13,13 +13,24 @@ This repository has the following structure:
 * **/solution** - containing the solution packages for the dockerfile, pipelines and operators. Each operator has a rudimentary documentation yet generated from the operator-code
 * **/data_repository** - for example data to test the operators
 
-In summary the framework consists of 
+## 4 Parts for Text Analysis
 
-* **scrapy** container that receives 5 files (pipelines.py, settings.py, spider.py, items.py and middlewares.py) through its inports and delivers the articles via 2 outports (json-string and dict). The json-string data can be saved directly on an object store while the dictionary-formated output can further processed. 
+### Getting the Texts by Scraping News Articles from Websites
+
+The tool of choice is the widely used open source framework [**scrapy**](https://scrapy.org).  container that receives 5 files (pipelines.py, settings.py, spider.py, items.py and middlewares.py) through its inports and delivers the articles via 2 outports (json-string and dict). The json-string data can be saved directly on an object store while the dictionary-formated output can further processed. 
+
 * **meta-data** operator for saving the metadata of the article in a *HANA DB* table as reference
-* **word extraction** operator using spacy for tokenizing, lemmatising and further cleasing the text by heuristic rules and using a *blacklist-file* for words to be ommitted. A *lexicon.csv* can be used to map the words according to the lexicon lists. The result is stored as an index in a HANA DB table. 
-* **topic finding** operator uses an Latent Dirichlet Allocation algorithm to find word clusters that could interpreted as *topics*
+
+### Identifying Words as Grammatical and Semantic Entities
+* **word_index** operator using spacy for tokenizing, lemmatising and further cleasing the text by heuristic rules and using a *blacklist-file* for words to be ommitted. A *lexicon.csv* can be used to map the words according to the lexicon lists. The result is stored as an index in a HANA DB table. 
+
+### Detecting Sentiment Scoring 
 * **sentiment analysis** to provide the *sentiment and subjectivity polarity* of the articles acccording to the used words
+
+### Identifying Topics 
+* **topic finding** operator uses an Latent Dirichlet Allocation algorithm to find word clusters that could interpreted as *topics*
+
+
 
 # Short Introduction into Text Analysis
 Text analysis examines a larger amount of texts (= 'corpora') by using a number of algorithms in order to extract information from it. The basic level is to divide the text into **tokens** and then into **words** with its grammatical attributes. From there you can apply the next level of analytical methods to classify the text according e.g. to the sentiment, subjectivity or topic. 
