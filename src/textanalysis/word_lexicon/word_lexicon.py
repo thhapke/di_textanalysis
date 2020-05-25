@@ -143,44 +143,44 @@ def process(msg):
     # word type
     word_types = tfp.read_list(api.config.word_types)
     if not word_types :
-        word_types = list(df['TYPE'].unique())
+        word_types = list(df['type'].unique())
 
     # Language filter
     language_filter = tfp.read_list(api.config.language_filter)
     if not language_filter :
-        language_filter = list(df['LANGUAGE'].unique())
+        language_filter = list(df['language'].unique())
 
-    mask = df['TYPE'].isin(word_types) & df['LANGUAGE'].isin(language_filter)
+    mask = df['type'].isin(word_types) & df['language'].isin(language_filter)
 
     lex_list = list()
     for lang in lexicon:
-        words_row = lexicon.loc[(lexicon['MAPPING']=='M') & lexicon['LANGUAGE'].isin(language_filter)]
+        words_row = lexicon.loc[(lexicon['mapping']=='M') & lexicon['language'].isin(language_filter)]
         for index, row in words_row.iterrows():
-            new_df = df.loc[mask & df['WORD'].str.match(row['WORD'])].copy()
-            new_df['TYPE'] = 'LEX'
-            new_df['WORD'] = row['CATEGORY']
+            new_df = df.loc[mask & df['word'].str.match(row['word'])].copy()
+            new_df['type'] = 'LEX'
+            new_df['word'] = row['category']
             lex_list.append(new_df)
-        words_row = lexicon.loc[(lexicon['MAPPING']=='FM') & lexicon['LANGUAGE'].isin(language_filter)]
+        words_row = lexicon.loc[(lexicon['mapping']=='FM') & lexicon['language'].isin(language_filter)]
         for index, row in words_row.iterrows():
-            new_df = df.loc[mask & (df['WORD'] == row['WORD'])].copy()
-            new_df['TYPE'] = 'LEX'
-            new_df['WORD'] = row['CATEGORY']
+            new_df = df.loc[mask & (df['word'] == row['word'])].copy()
+            new_df['type'] = 'LEX'
+            new_df['word'] = row['category']
             lex_list.append(new_df)
-        words_row = lexicon.loc[(lexicon['MAPPING']=='C') & lexicon['LANGUAGE'].isin(language_filter)]
+        words_row = lexicon.loc[(lexicon['mapping']=='C') & lexicon['language'].isin(language_filter)]
         for index, row in words_row.iterrows():
-            new_df = df.loc[mask & df['WORD'].str.contains(row['WORD'])].copy()
-            new_df['TYPE'] = 'LEX'
-            new_df['WORD'] = row['CATEGORY']
+            new_df = df.loc[mask & df['word'].str.contains(row['word'])].copy()
+            new_df['type'] = 'LEX'
+            new_df['word'] = row['category']
             lex_list.append(new_df)
         lex_list.append(new_df)
     new_df = pd.concat(lex_list)
     df = df.append(new_df,ignore_index = True)
 
 
-    df = df.groupby(by=['ID','LANGUAGE','TYPE','WORD'])['COUNT'].sum().reset_index()
+    df = df.groupby(by=['text_id','language','type','word'])['count'].sum().reset_index()
 
     # test for duplicates
-    dup_s = df.duplicated(subset=['ID','LANGUAGE','TYPE','WORD']).value_counts()
+    dup_s = df.duplicated(subset=['text_id','language','type','word']).value_counts()
     num_duplicates = dup_s[True] if True in dup_s  else 0
     logger.info('Duplicates: {} / {}'.format(num_duplicates, df.shape[0]))
 
@@ -207,7 +207,7 @@ def test_operator():
     api.set_config(config)
 
     # LEXICON
-    lex_filename = '/Users/Shared/data/onlinemedia/repository/lexicon.csv'
+    lex_filename = '../../../data_repository/lexicon.csv'
     df = pd.read_csv(lex_filename,sep=',',nrows=10000000)
     msg = api.Message(attributes={'format':'DataFrame'}, body=df)
     setup_lexicon(msg)
@@ -220,13 +220,9 @@ def test_operator():
 
 
     # saving outcome as word index
-    with open('/Users/Shared/data/onlinemedia/data/word_extraction_regex_lexicon.csv', 'w') as f:
-        writer = csv.writer(f)
-        cols = ['HASH_TEXT', 'LANGUAGE', 'TYPE', 'WORD', 'COUNT']
-        writer.writerow(cols)
-        for msg in api.queue:
-            for rec in msg.body:
-                writer.writerow(rec)
+    out_file = '/Users/Shared/data/onlinemedia/data/word_extraction_regex_lexicon.csv'
+    df_list = [d.body for d in api.queue_d]
+    pd.concat(df_list).to_csv(out_file, index=False)
 
 
 if __name__ == '__main__':

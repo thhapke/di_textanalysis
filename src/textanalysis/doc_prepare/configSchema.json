@@ -30,8 +30,8 @@
             "type": "string"
         },
         "default_language": {
-            "title": "Language",
-            "description": "Language of the texts",
+            "title": "Default language",
+            "description": "Default language of the texts",
             "type": "string"
         },
         "remove_html_tags": {

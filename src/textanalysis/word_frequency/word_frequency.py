@@ -70,19 +70,19 @@ def process(msg):
     time_monitor = tp.progress()
 
     df = msg.body
-    df['COUNT'] = df['COUNT'].astype('int32')
+    df['count'] = df['count'].astype('int32')
 
     # word type
     word_types = tfp.read_list(api.config.word_types)
     if word_types :
-        df = df.loc[df['TYPE'].isin(word_types)]
+        df = df.loc[df['type'].isin(word_types)]
 
     # Language filter
     language_filter = tfp.read_list(api.config.language_filter)
     if language_filter :
-        df = df.loc[df['LANGUAGE'].isin(language_filter)]
+        df = df.loc[df['language'].isin(language_filter)]
 
-    df = df.groupby(['LANGUAGE','TYPE','WORD'])['COUNT'].agg('sum').reset_index()
+    df = df.groupby(['language','type','word'])['count'].agg('sum').reset_index()
 
     api.send(outports[1]['name'], api.Message(attributes=att_dict, body=df))
     api.send(outports[0]['name'],log_stream.getvalue())

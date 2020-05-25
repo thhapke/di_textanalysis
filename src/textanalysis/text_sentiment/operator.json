@@ -3,6 +3,11 @@
     "component": "com.sap.system.python3Operator",
     "inports": [
         {
+            "name": "sentiment_list",
+            "type": "message.DataFrame",
+            "description": "Sentiment list"
+        },
+        {
             "name": "texts",
             "type": "message.DataFrame",
             "description": "DataFrame with texts"

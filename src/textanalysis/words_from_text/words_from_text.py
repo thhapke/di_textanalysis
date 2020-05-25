@@ -2,6 +2,7 @@ import json
 import os
 import csv
 import pandas as pd
+import numpy as np
 import re
 import pickle
 import collections
@@ -32,7 +33,8 @@ try:
 except NameError:
     class api:
 
-        queue = list()
+        queue_data = list()
+        queue_sentiments = list()
 
         class Message:
             def __init__(self, body=None, attributes=""):
@@ -40,8 +42,10 @@ except NameError:
                 self.attributes = attributes
 
         def send(port, msg):
-            if port == outports[1]['name']:
-                api.queue.append(msg)
+            if port == outports[2]['name']:
+                api.queue_data.append(msg)
+            elif port == outports[1]['name']:
+                api.queue_sentiments.append(msg)
             else:
                 # print('{}: {}'.format(port, msg))
                 pass
@@ -84,36 +88,73 @@ except NameError:
             config_params['min_word_len'] = {'title': 'Minimum word length', 'description': 'Minimum word length.',
                                              'type': 'integer'}
 
+            sentiments = False
+            config_params['sentiments'] = {'title': 'Do sentiment analysis using word list',
+                                           'description': 'Do sentiment analysis using word list.',
+                                           'type': 'boolean'}
+
 
 # global variables
 id_set = set()
+list_df = pd.DataFrame()
+att_dict = dict()
+sentiment_words_df = pd.DataFrame()
+operator_name = 'words_from_text'
+
+def setup_sentiment_list(msg):
+    global sentiment_words_df
+    logger, log_stream = slog.set_logging(operator_name, api.config.debug_mode)
+    logger.info('Set sentiment_list')
+    logger.debug('Attributes: {}'.format(msg.attributes))
+    sentiment_words_df = msg.body
+    api.send(outports[0]['name'], log_stream.getvalue())
+    process(None)
 
 def process(msg):
     global id_set
+    global list_df
+    global sentiment_words_df
+    global att_dict
 
-    operator_name = 'words_from_text'
     logger, log_stream = slog.set_logging(operator_name, api.config.debug_mode)
-
     logger.info("Main Process started. Logging level: {}".format(logger.level))
     time_monitor = tp.progress()
 
-    df = msg.body
-    att_dict = msg.attributes
+    # sync data and setup msg
+    # Case: do sentiment AND sentiment_setup not done/msg with data
+    if api.config.sentiments and sentiment_words_df.empty :
+        logger.info('Sentiment word list not setup yet!')
+        api.send(outports[0]['name'], log_stream.getvalue())
+        att_dict = msg.attributes
+        if list_df.empty :
+            list_df = msg.body
+        else :
+            list_df = pd.concat(list_df,msg.body)
+        return 0
+    # Case: Sentiment setup called process and data has been sent previously
+    elif msg == None and not list_df.empty:
+        df = list_df
+    # Case: Sentiment setup called process and data has NOT been sent previously
+    elif msg == None and  list_df.empty:
+        return 0
+    # Case:  data sent and no sentiment analysis is required
+    else :
+        df = msg.body
 
     # Remove ID that has been processed
-    df = df.loc[~df['ID'].isin(id_set)]
-    id_set.update(df['ID'].unique().tolist())
+    df = df.loc[~df['text_id'].isin(id_set)]
+    id_set.update(df['text_id'].unique().tolist())
 
     # Languages
     language_filter = tfp.read_value(api.config.language)
     logger.info('Language filter: {}'.format(language_filter))
     if not language_filter :
-        language_filter = df['LANGUAGE'].unique().tolist()
+        language_filter = df['language'].unique().tolist()
     language_filter = [ lang for lang in language_filter if lang in language_models.keys()]
     nlp = dict()
     for lc in language_filter :
         nlp[lc] = spacy.load(language_models[lc])
-    df = df.loc[df['LANGUAGE'].isin(language_filter)]
+    df = df.loc[df['language'].isin(language_filter)]
 
     # Warning for languages not supported
     languages_not_supported =  [ lang for lang in language_filter if not lang in language_models.keys()]
@@ -129,7 +170,7 @@ def process(msg):
 
     # Create doc for all
     word_bag_list = list()
-
+    sentiment_list = list()
     def get_words(id, language, text) :
         if not isinstance(text,str) :
             logger.warning(('Record with error - ID: {} - {}'.format(id,text) ))
@@ -140,32 +181,46 @@ def process(msg):
             words.extend([[id,language,t,token.lemma_[:api.config.max_word_len]] for token in doc if token.pos_ == t])
         for et in entity_types:
             words.extend([[id,language,et,ent.text[:api.config.max_word_len]] for ent in doc.ents if ent.label_ == et])
-        word_bag_list.append(pd.DataFrame(words,columns = ['ID','LANGUAGE','TYPE','WORD']))
+        # sentiment
+        if language == 'DE' and api.config.sentiments:
+            lemmatized = [ token.lemma_ for token in doc]
+            ls = sentiment_words_df.loc[sentiment_words_df.index.isin(lemmatized) , 'value']
+            sentiment_list.append([id,round(sentiment_words_df.loc[sentiment_words_df.index.isin(lemmatized) , 'value'].mean(), 2)])
 
-    df.apply(lambda x : get_words(x['ID'],x['LANGUAGE'],x['TEXT']),axis=1)
+        word_bag_list.append(pd.DataFrame(words,columns = ['text_id','language','type','word']))
+
+    df.apply(lambda x : get_words(x['text_id'],x['language'],x['text']),axis=1)
+
+
     word_bag = pd.concat(word_bag_list)
-    word_bag =  word_bag.loc[word_bag['WORD'].str.len() >= api.config.min_word_len ]
-    word_bag['COUNT'] = 1
-    word_bag = word_bag.groupby(['ID','LANGUAGE','TYPE','WORD'])['COUNT'].sum().reset_index()
+    word_bag =  word_bag.loc[word_bag['word'].str.len() >= api.config.min_word_len ]
+    word_bag['count'] = 1
+    word_bag = word_bag.groupby(['text_id','language','type','word'])['count'].sum().reset_index()
 
     # test for duplicates
-    dup_s = word_bag.duplicated(subset=['ID','LANGUAGE','TYPE','WORD']).value_counts()
+    dup_s = word_bag.duplicated(subset=['text_id','language','type','word']).value_counts()
     num_duplicates = dup_s[True] if True in dup_s  else 0
     logger.info('Duplicates: {} / {}'.format(num_duplicates, word_bag.shape[0]))
 
     att_dict['message.lastBatch'] = True
-    table_msg = api.Message(attributes=att_dict, body=word_bag)
+    data_msg = api.Message(attributes=att_dict, body=word_bag)
+    sentiments_msg = api.Message(attributes=att_dict, body=pd.DataFrame(sentiment_list))
 
-    logger.info('Labels in document: {}'.format(word_bag['TYPE'].unique().tolist()))
+    logger.info('Labels in document: {}'.format(word_bag['type'].unique().tolist()))
     api.send(outports[0]['name'], log_stream.getvalue())
-    api.send(outports[1]['name'], table_msg)
+    api.send(outports[1]['name'], sentiments_msg)
+
+    api.send(outports[2]['name'], data_msg)
 
 
-inports = [{'name': 'docs', 'type': 'message.DataFrame', "description": "Message with body as dictionary."}]
+
+inports = [{'name': 'sentiment_list', 'type': 'message.DataFrame', "description": "Sentiment list"},
+           {'name': 'docs', 'type': 'message.DataFrame', "description": "Message with body as dictionary."}]
 outports = [{'name': 'log', 'type': 'string', "description": "Logging data"}, \
+            {'name': 'sentiments', 'type': 'message.DataFrame', "description": "Table with sentiments"},\
             {'name': 'data', 'type': 'message.DataFrame', "description": "Table with word index"}]
 
-
+#api.set_port_callback(inports[0]['name'], setup_sentiment_list)
 #api.set_port_callback(inports[0]['name'], process)
 
 
@@ -179,6 +234,7 @@ def test_operator():
     config.max_word_len = 80
     config.min_word_len = 3
     config.batch_size = 10
+    config.sentiments = True
     api.set_config(config)
 
 
@@ -187,11 +243,17 @@ def test_operator():
     msg = api.Message(attributes={'file': {'path': doc_file},'format':'pandas'}, body=df)
     process(msg)
 
-    out_file = '/Users/Shared/data/onlinemedia/data/word_extraction.csv'
-    df_list = [d.body for d in api.queue]
+    df_s = pd.read_csv('../../../data_repository/sentiments_DE.csv', sep=',',index_col = 'word' )
+    msg = api.Message(attributes={'file': {'path': doc_file},'format':'pandas'}, body=df_s)
+    setup_sentiment_list(msg)
+
+    out_file = '/Users/Shared/data/onlinemedia/data/text_sentiment_words.csv'
+    df_list = [d.body for d in api.queue_sentiments]
     pd.concat(df_list).to_csv(out_file,index=False)
 
-
+    out_file = '/Users/Shared/data/onlinemedia/data/word_index.csv'
+    df_list = [d.body for d in api.queue_data]
+    pd.concat(df_list).to_csv(out_file,index=False)
 
 if __name__ == '__main__':
     test_operator()

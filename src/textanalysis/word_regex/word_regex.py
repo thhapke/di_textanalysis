@@ -85,20 +85,20 @@ def process(msg):
 
     # Dataframe
     df = msg.body
-    df['WORD_M'] = np.nan
+    df['word_m'] = np.nan
     df['WORD_R'] = np.nan
 
     # word type
     word_types = tfp.read_list(api.config.word_types)
     if not word_types :
-        word_types = list(df['TYPE'].unique())
+        word_types = list(df['type'].unique())
 
     # Language filter
     language_filter = tfp.read_list(api.config.language_filter)
     if not language_filter :
-        language_filter = list(df['LANGUAGE'].unique())
+        language_filter = list(df['language'].unique())
 
-    mask = df['LANGUAGE'].isin(language_filter) & df['TYPE'].isin(word_types)
+    mask = df['language'].isin(language_filter) & df['type'].isin(word_types)
 
     # regex patterns word removal
     regex_wordr = tfp.read_list(api.config.pattern_word_removal)
@@ -109,7 +109,7 @@ def process(msg):
             api.send(outports[0]['name'], log_stream.getvalue())
             log_stream.truncate()
             log_stream.seek(0)
-            df.loc[mask & df['WORD'].str.contains(pat = pat),'WORD_R'] = pat
+            df.loc[mask & df['word'].str.contains(pat = pat),'word_r'] = pat
 
     # regex patterns word removal
     regex_ssr = tfp.read_dict(api.config.pattern_substring_replace)
@@ -119,20 +119,20 @@ def process(msg):
             api.send(outports[0]['name'], log_stream.getvalue())
             log_stream.truncate()
             log_stream.seek(0)
-            df.loc[mask & df['WORD'].str.contains(pat=pat[0]), 'WORD_M'] = pat[0]
-            df.loc[mask,'WORD'] = df.loc[mask,'WORD'].str.replace(pat[0],pat[1],regex = True)
+            df.loc[mask & df['word'].str.contains(pat=pat[0]), 'word_m'] = pat[0]
+            df.loc[mask,'word'] = df.loc[mask,'word'].str.replace(pat[0],pat[1],regex = True)
 
-    r_df= df.loc[df[['WORD_R','WORD_M']].any(axis=1),['WORD','WORD_R','WORD_M']].drop_duplicates()
-    df.drop(df.loc[~df['WORD_R'].isnull()].index,axis = 0, inplace = True)
-    df.drop(columns=['WORD_R','WORD_M'],inplace = True)
+    r_df= df.loc[df[['word_r','word_m']].any(axis=1),['word','word_r','word_m']].drop_duplicates()
+    df.drop(df.loc[~df['word_r'].isnull()].index,axis = 0, inplace = True)
+    df.drop(columns=['word_r','word_m'],inplace = True)
 
     # test for duplicates
-    dup_s = df.duplicated(subset=['ID','LANGUAGE','TYPE','WORD']).value_counts()
+    dup_s = df.duplicated(subset=['text_id','language','type','word']).value_counts()
     num_duplicates = dup_s[True] if True in dup_s  else 0
     logger.info('Duplicates: {} / {}'.format(num_duplicates, df.shape[0]))
 
 
-    api.send(outports[1]['name'], api.Message(attributes={'Type':'Removed Wors','Format':'list'}, body=r_df))
+    api.send(outports[1]['name'], api.Message(attributes={'Type':'Removed Words','Format':'list'}, body=r_df))
     api.send(outports[2]['name'], api.Message(attributes=att_dict, body=df))
     api.send(outports[0]['name'],log_stream.getvalue())
 

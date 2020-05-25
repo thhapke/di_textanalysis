@@ -86,30 +86,33 @@ def process(msg):
 
     df = msg.body
     att_dict = msg.attributes
-    df['Polarity'] = np.nan
-    df['Subjectivity'] = np.nan
-    df[['Polarity','Subjectivity']] = df.apply(lambda row: pd.Series(get_sentiment(row['TEXT'], row['LANGUAGE']),dtype='object'),axis=1)
-    df['Polarity'] = df['Polarity'].round(2)
-    df['Subjectivity'] = df['Subjectivity'].round(2)
+    df['polarity'] = np.nan
+    df['subjectivity'] = np.nan
+    df[['polarity','subjectivity']] = df.apply(lambda row: pd.Series(get_sentiment(row['text'], row['language']),dtype='object'),axis=1)
+    df['polarity'] = df['polarity'].round(2)
+    df['subjectivity'] = df['subjectivity'].round(2)
 
     logger.info('Text processed: {}'.format(df.shape[0]))
     logger.debug('Process ended{}'.format(time_monitor.elapsed_time()))
 
     api.send(outports[0]['name'], log_stream.getvalue())
-    api.send(outports[1]['name'], api.Message(attributes=att_dict,body=df[['ID','Polarity','Subjectivity']]))
+    api.send(outports[1]['name'], api.Message(attributes=att_dict,body=df[['text_id','polarity','subjectivity']]))
 
 
 
-inports = [{'name': 'texts', 'type': 'message.DataFrame', "description": "DataFrame with texts"}]
+inports = [{'name': 'sentiment_list', 'type': 'message.DataFrame', "description": "Sentiment list"},
+           {'name': 'texts', 'type': 'message.DataFrame', "description": "DataFrame with texts"}]
 outports = [{'name': 'log', 'type': 'string', "description": "Logging data"},
             {'name': 'data', 'type': 'message.DataFrame', "description": "data of sentiments"}]
 
-# api.set_port_callback(inports[0]['name'], process)
+# api.set_port_callback(inports[0]['name'], setup_sentiment_list)
+# api.set_port_callback(inports[1]['name'], process)
 
 def test_operator():
     config = api.config
     config.debug_mode = True
     config.language_filter = 'DE'
+    config.use_sentiment_word_list = True
     api.set_config(config)
 
     doc_file = '/Users/Shared/data/onlinemedia/data/doc_data_cleansed.csv'
@@ -122,7 +125,7 @@ def test_operator():
     pd.concat(df_list).to_csv(out_file,index=False)
 
 if __name__ == '__main__':
-    #test_operator()
+    test_operator()
     if True:
         subprocess.run(["rm",'-r','/Users/d051079/OneDrive - SAP SE/GitHub/di_textanalysis/solution/operators/textanalysis_' + api.config.version])
         gs.gensolution(os.path.realpath(__file__), api.config, inports, outports)

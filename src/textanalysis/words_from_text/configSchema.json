@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-06/schema#",
-    "$id": "http://sap.com/vflow/textanalysis.words_from_text.configSchema.json",
+    "$id": "http://sap.com/vflow/textanalysis.words_from_text2.configSchema.json",
     "type": "object",
     "properties": {
         "codelanguage": {
@@ -38,6 +38,11 @@
             "title": "Minimum word length",
             "description": "Minimum word length.",
             "type": "integer"
+        },
+        "sentiments": {
+            "title": "Do sentiment analysis using word list",
+            "description": "Do sentiment analysis using word list.",
+            "type": "boolean"
         }
     }
 }

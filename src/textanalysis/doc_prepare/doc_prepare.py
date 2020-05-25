@@ -62,14 +62,14 @@ except NameError:
                                            'description': 'Name of incoming id column',
                                            'type': 'string'}
 
-            language_column = 'LANGUAGE'
+            language_column = 'language'
             config_params['language_column'] = {'title': 'Name of language column',
                                            'description': 'Name of language column in input data.',
                                            'type': 'string'}
 
             default_language = 'DE'
-            config_params['default_language'] = {'title': 'Language',
-                                           'description': 'Language of the texts',
+            config_params['default_language'] = {'title': 'Default language',
+                                           'description': 'Default language of the texts',
                                            'type': 'string'}
 
             remove_html_tags =  False
@@ -98,51 +98,53 @@ def process(msg):
 
     text_column = tfp.read_value(api.config.text_column)
     if not text_column :
-        text_column = 'TEXT'
+        text_column = 'text'
 
     id_column = tfp.read_value(api.config.id_column)
     if not id_column:
-        id_column = 'ID'
+        id_column = 'text_id'
 
+    default_language = 'DE'
     if api.config.media_docs :
-        df['LANGUAGE'] = 'DE'
-        df.loc[df['media'].isin(['Lefigaro','Lemonde']),'LANGUAGE'] = 'FR'
-        df.loc[df['media'].isin(['Elpais', 'Elmundo']), 'LANGUAGE'] = 'ES'
+        language_column = 'language'
+        df['language'] = default_language
+        df.loc[df['media'].isin(['Lefigaro','Lemonde']),'language'] = 'FR'
+        df.loc[df['media'].isin(['Elpais', 'Elmundo']), 'language'] = 'ES'
     else :
         language_column = tfp.read_value(api.config.language_column)
         if not language_column :
-            language_column = 'LANGUAGE'
+            language_column = 'language'
 
-        default_language = tfp.read_value(api.config.default_language)
-        if not default_language :
-            default_language = 'DE'
+        r_default_language = tfp.read_value(api.config.default_language)
+        if r_default_language :
+            default_language = r_default_language
 
         if not language_column in df.columns :
             df[language_column] = default_language
         else :
-            df.loc[df['LANGUAGE'].isna()] = default_language
+            df.loc[df['language'].isna()] = default_language
 
-    df.rename(columns={text_column: 'TEXT', id_column: 'ID', language_column:'LANGUAGE'}, inplace=True)
+    df.rename(columns={text_column: 'text', id_column: 'text_id', language_column:'language'}, inplace=True)
     logger.debug('Columns: {}'.format(df.columns))
 
     logger.info("Default language: {}".format(default_language))
 
 
     # remove duplicates
-    df.drop_duplicates(subset = ['ID'],inplace = True)
-    df = df.loc[~df['ID'].isin(ID_set)]
-    ID_set.update(df.ID.values.tolist())
+    df.drop_duplicates(subset = ['text_id'],inplace = True)
+    df = df.loc[~df['text_id'].isin(ID_set)]
+    ID_set.update(df.text_id.values.tolist())
 
     # replace html tags
     if api.config.remove_html_tags :
-        df['TEXT'] = df['TEXT'].str.replace('<.*?>','',regex=True)
+        df['text'] = df['text'].str.replace('<.*?>','',regex=True)
 
     # replace double double quotes
-    df['TEXT'] = df['TEXT'].str.replace('""', '', regex=False)
-    df['TEXT'] = df['TEXT'].str.replace('."', '. "', regex=False)
+    df['text'] = df['text'].str.replace('""', '', regex=False)
+    df['text'] = df['text'].str.replace('."', '. "', regex=False)
 
     api.send(outports[0]['name'], log_stream.getvalue())
-    api.send(outports[1]['name'], api.Message(attributes=att_dict,body=df[['ID','LANGUAGE','TEXT']]))
+    api.send(outports[1]['name'], api.Message(attributes=att_dict,body=df[['text_id','language','text']]))
 
 
 inports = [{'name': 'docs', 'type': 'message.DataFrame', "description": "Message table."}]
