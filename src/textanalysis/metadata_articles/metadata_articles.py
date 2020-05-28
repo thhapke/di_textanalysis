@@ -116,6 +116,8 @@ def test_operator():
     files_in_dir = [f for f in os.listdir(in_dir) if os.path.isfile(os.path.join(in_dir, f)) and re.match('.*json', f)]
 
     for i, fname in enumerate(files_in_dir):
+        if i > 1 :
+            break
 
         fbase = fname.split('.')[0]
         eos = True if len(files_in_dir) == i + 1 else False
@@ -132,6 +134,7 @@ if __name__ == '__main__':
     test_operator()
 
     if True :
+        subprocess.run(["rm",'-r','/Users/d051079/OneDrive - SAP SE/GitHub/di_textanalysis/solution/operators/textanalysis_' + api.config.version])
         gs.gensolution(os.path.realpath(__file__), api.config, inports, outports)
         solution_name = api.config.operator_name+'_'+api.config.version
         subprocess.run(["vctl", "solution", "bundle", '/Users/d051079/OneDrive - SAP SE/GitHub/di_textanalysis/solution/operators/textanalysis_0.0.18',\

@@ -1,0 +1,377 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="8299bcdf-79ad-43d7-90c2-209cd28e7adf" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/utils/rework_onlinedocs.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/solution/operators/scrapy_0.0.2.zip" beforeDir="false" afterPath="$PROJECT_DIR$/solution/operators/scrapy_0.0.2.zip" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/solution/operators/textanalysis_0.0.18/content/files/vflow/subengines/com/sap/python36/operators/textanalysis/word_frequency/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/solution/operators/textanalysis_0.0.18/content/files/vflow/subengines/com/sap/python36/operators/textanalysis/word_frequency/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/solution/operators/textanalysis_0.0.18/content/files/vflow/subengines/com/sap/python36/operators/textanalysis/word_frequency/configSchema.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/solution/operators/textanalysis_0.0.18/content/files/vflow/subengines/com/sap/python36/operators/textanalysis/word_frequency/operator.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/solution/operators/textanalysis_0.0.18/content/files/vflow/subengines/com/sap/python36/operators/textanalysis/word_frequency/word_frequency.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/solution/operators/textanalysis_0.0.18/content/files/vflow/subengines/com/sap/python36/operators/textanalysis/word_frequency/word_frequency.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/solution/operators/textanalysis_0.0.2/content/files/vflow/subengines/com/sap/python36/operators/textanalysis/scrapy/scrapy.py" beforeDir="false" afterPath="$PROJECT_DIR$/solution/operators/textanalysis_0.0.2/content/files/vflow/subengines/com/sap/python36/operators/textanalysis/scrapy/scrapy.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/solution/operators/word_blacklist_0.0.18.zip" beforeDir="false" afterPath="$PROJECT_DIR$/solution/operators/word_blacklist_0.0.18.zip" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/textanalysis/scrapy/scrapy.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/textanalysis/scrapy/scrapy.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/textanalysis/word_blacklist/word_blacklist.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/textanalysis/word_blacklist/word_blacklist.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/textanalysis/words_from_text/words_from_text.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/textanalysis/words_from_text/words_from_text.py" afterDir="false" />
+    </list>
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1ZeorPNiuWiUgsVoSRTqQxDUdQ8" />
+  <component name="PropertiesComponent">
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/textanalysis" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/deprecated" />
+      <recent name="$PROJECT_DIR$/src/textanalysis" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/textanalysis" />
+      <recent name="$PROJECT_DIR$/src/textanalysis/doc_prepare" />
+      <recent name="$PROJECT_DIR$/src/textanalysis/word_extraction2" />
+      <recent name="$PROJECT_DIR$/src/textanalysis/word_frequency_sql" />
+    </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="RunManager" selected="Python.rework_onlinedocs">
+    <configuration name="doc_prepare" type="PythonConfigurationType" factoryName="Python">
+      <module name="di_textanalysis" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src/textanalysis/doc_prepare" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/textanalysis/doc_prepare/doc_prepare.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="rework_onlinedocs" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="di_textanalysis" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/utils" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/utils/rework_onlinedocs.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="scrapy" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="di_textanalysis" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src/textanalysis/scrapy" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/textanalysis/scrapy/scrapy.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="word_blacklist" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="di_textanalysis" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src/textanalysis/word_blacklist" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/textanalysis/word_blacklist/word_blacklist.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="word_frequency" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="di_textanalysis" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src/textanalysis/word_frequency" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/textanalysis/word_frequency/word_frequency.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="word_lexicon" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="di_textanalysis" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src/textanalysis/word_lexicon" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/textanalysis/word_lexicon/word_lexicon.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.rework_onlinedocs" />
+        <item itemvalue="Python.scrapy" />
+        <item itemvalue="Python.word_blacklist" />
+        <item itemvalue="Python.word_frequency" />
+        <item itemvalue="Python.word_lexicon" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="8299bcdf-79ad-43d7-90c2-209cd28e7adf" name="Default Changelist" comment="" />
+      <created>1585209118206</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1585209118206</updated>
+      <workItem from="1585209119778" duration="3423000" />
+      <workItem from="1585310419089" duration="15935000" />
+      <workItem from="1585713671942" duration="12099000" />
+      <workItem from="1586632178473" duration="39980000" />
+      <workItem from="1587480380438" duration="45814000" />
+      <workItem from="1588082591782" duration="23992000" />
+      <workItem from="1588925663324" duration="170456000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/deprecated/word_extraction/word_extraction.py</url>
+          <line>290</line>
+          <option name="timeStamp" value="5" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/deprecated/word_regex_cleansing/word_regex_cleansing.py</url>
+          <line>154</line>
+          <option name="timeStamp" value="8" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/textanalysis/metadata_articles/metadata_articles.py</url>
+          <line>104</line>
+          <option name="timeStamp" value="10" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/textanalysis/word_trend/word_trend.py</url>
+          <line>277</line>
+          <option name="timeStamp" value="15" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/deprecated/words_from_text/words_from_text.py</url>
+          <line>142</line>
+          <option name="timeStamp" value="31" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/deprecated/words_from_text/words_from_text.py</url>
+          <line>184</line>
+          <option name="timeStamp" value="34" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/deprecated/words_from_text/words_from_text.py</url>
+          <line>181</line>
+          <option name="timeStamp" value="35" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/textanalysis/word_frequency/word_frequency.py</url>
+          <line>75</line>
+          <option name="timeStamp" value="37" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/textanalysis/word_frequency/word_frequency.py</url>
+          <line>106</line>
+          <option name="timeStamp" value="38" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/textanalysis/word_regex/word_regex.py</url>
+          <line>167</line>
+          <option name="timeStamp" value="39" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/textanalysis/word_lexicon/word_lexicon.py</url>
+          <line>187</line>
+          <option name="timeStamp" value="51" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/textanalysis/word_lexicon/word_lexicon.py</url>
+          <line>182</line>
+          <option name="timeStamp" value="59" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/textanalysis/metadata_articles/metadata_articles.py</url>
+          <line>71</line>
+          <option name="timeStamp" value="60" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/textanalysis/doc_prepare/doc_prepare.py</url>
+          <line>135</line>
+          <option name="timeStamp" value="61" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/textanalysis/doc_prepare/doc_prepare.py</url>
+          <line>134</line>
+          <option name="timeStamp" value="62" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/textanalysis/doc_prepare/doc_prepare.py</url>
+          <line>129</line>
+          <option name="timeStamp" value="63" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/textanalysis/words_from_text/words_from_text.py</url>
+          <line>169</line>
+          <option name="timeStamp" value="69" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/textanalysis/words_from_text/words_from_text.py</url>
+          <line>206</line>
+          <option name="timeStamp" value="70" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+    <watches-manager>
+      <configuration name="PythonConfigurationType">
+        <watch expression="api.config" language="Python" />
+        <watch expression="ID_set" language="Python" />
+        <watch expression="list_df" language="Python" />
+      </configuration>
+    </watches-manager>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/di_textanalysis$sentiment_analysis.coverage" NAME="sentiment_analysis Coverage Results" MODIFIED="1586146857987" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/textanalysis/sentiment_analysis" />
+    <SUITE FILE_PATH="coverage/di_textanalysis$word_index_lexicon.coverage" NAME="word_index_lexicon Coverage Results" MODIFIED="1587926639983" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/textanalysis/word_index_lexicon" />
+    <SUITE FILE_PATH="coverage/di_textanalysis$word_trend.coverage" NAME="word_trend Coverage Results" MODIFIED="1587639416509" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/textanalysis/word_trend" />
+    <SUITE FILE_PATH="coverage/di_textanalysis$word_indexing.coverage" NAME="word_indexing Coverage Results" MODIFIED="1587115599103" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/textanalysis/word_indexing" />
+    <SUITE FILE_PATH="coverage/di_textanalysis$words_from_text2.coverage" NAME="words_from_text2 Coverage Results" MODIFIED="1589115706992" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/textanalysis/words_from_text2" />
+    <SUITE FILE_PATH="coverage/di_textanalysis$topic_dispatcher.coverage" NAME="topic_dispatcher Coverage Results" MODIFIED="1585210361227" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/textanalysis/topic_dispatcher" />
+    <SUITE FILE_PATH="coverage/di_textanalysis$scrapy.coverage" NAME="scrapy Coverage Results" MODIFIED="1590550820304" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/textanalysis/scrapy" />
+    <SUITE FILE_PATH="coverage/di_textanalysis$word_frequency_sql.coverage" NAME="word_frequency_sql Coverage Results" MODIFIED="1587298385070" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/textanalysis/word_frequency_sql" />
+    <SUITE FILE_PATH="coverage/di_textanalysis$metadata_articles.coverage" NAME="metadata_articles Coverage Results" MODIFIED="1589800219326" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/textanalysis/metadata_articles" />
+    <SUITE FILE_PATH="coverage/di_textanalysis$scapy.coverage" NAME="scapy Coverage Results" MODIFIED="1590122928793" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/textanalysis/scrapy" />
+    <SUITE FILE_PATH="coverage/di_textanalysis$prep_sentiment.coverage" NAME="prep_sentiment Coverage Results" MODIFIED="1590316866494" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/utils" />
+    <SUITE FILE_PATH="coverage/di_textanalysis$word_index_blacklist.coverage" NAME="word_index_blacklist Coverage Results" MODIFIED="1589286274105" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/textanalysis/word_index_blacklist" />
+    <SUITE FILE_PATH="coverage/di_textanalysis$word_regex.coverage" NAME="word_regex Coverage Results" MODIFIED="1590411347538" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/textanalysis/word_regex" />
+    <SUITE FILE_PATH="coverage/di_textanalysis$word_blacklist.coverage" NAME="word_blacklist Coverage Results" MODIFIED="1590460735502" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/textanalysis/word_blacklist" />
+    <SUITE FILE_PATH="coverage/di_textanalysis$word_extraction.coverage" NAME="word_extraction Coverage Results" MODIFIED="1585838512795" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/textanalysis/word_extraction" />
+    <SUITE FILE_PATH="coverage/di_textanalysis$word_frequency.coverage" NAME="word_frequency Coverage Results" MODIFIED="1590412748250" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/textanalysis/word_frequency" />
+    <SUITE FILE_PATH="coverage/di_textanalysis$word_index_regex.coverage" NAME="word_index_regex Coverage Results" MODIFIED="1589772210413" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/textanalysis/word_index_regex" />
+    <SUITE FILE_PATH="coverage/di_textanalysis$pnas_preparation.coverage" NAME="pnas_preparation Coverage Results" MODIFIED="1590302421819" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/utils" />
+    <SUITE FILE_PATH="coverage/di_textanalysis$words_from_text.coverage" NAME="words_from_text Coverage Results" MODIFIED="1590392428270" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/textanalysis/words_from_text2" />
+    <SUITE FILE_PATH="coverage/di_textanalysis$word_regex_cleansing.coverage" NAME="word_regex_cleansing Coverage Results" MODIFIED="1587276456080" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/textanalysis/word_regex_cleansing" />
+    <SUITE FILE_PATH="coverage/di_textanalysis$text_sentiment.coverage" NAME="text_sentiment Coverage Results" MODIFIED="1590392582616" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/textanalysis/text_sentiment" />
+    <SUITE FILE_PATH="coverage/di_textanalysis$word_lexicon.coverage" NAME="word_lexicon Coverage Results" MODIFIED="1590412097048" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/textanalysis/word_lexicon" />
+    <SUITE FILE_PATH="coverage/di_textanalysis$doc_prepare.coverage" NAME="doc_prepare Coverage Results" MODIFIED="1590408852841" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/textanalysis/doc_prepare" />
+    <SUITE FILE_PATH="coverage/di_textanalysis$word_index_transform.coverage" NAME="word_index_transform Coverage Results" MODIFIED="1587547481142" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/textanalysis/word_index_transform" />
+    <SUITE FILE_PATH="coverage/di_textanalysis$topic_indexing.coverage" NAME="topic_indexing Coverage Results" MODIFIED="1585210457923" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/textanalysis/topic_indexing" />
+    <SUITE FILE_PATH="coverage/di_textanalysis$rework_onlinedocs.coverage" NAME="rework_onlinedocs Coverage Results" MODIFIED="1590552422610" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/utils" />
+    <SUITE FILE_PATH="coverage/di_textanalysis$topic_identification.coverage" NAME="topic_identification Coverage Results" MODIFIED="1585210412301" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/textanalysis/topic_identification" />
+    <SUITE FILE_PATH="coverage/di_textanalysis$word_extraction2.coverage" NAME="word_extraction2 Coverage Results" MODIFIED="1588155032949" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/textanalysis/word_extraction2" />
+  </component>
+</project>
