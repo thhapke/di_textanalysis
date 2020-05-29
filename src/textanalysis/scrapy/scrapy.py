@@ -81,7 +81,10 @@ def format_check_output(line, logger, json_elements = ['website', 'url', 'date',
         adict['text'] = adict['text'].replace('\n', ' ')
         adict['text_id'] = hash(adict['text'])
         adict['rubric'] = adict.pop('rubrics')
+<<<<<<< HEAD
         adict['num_characters'] = len(adict['text'])
+=======
+>>>>>>> 59fe1471b368a62934ab846ad04dfc3bdcb1c042
         return  adict
     else :
         logger.error('Not all required json elements in article record: {}'.format(line))
@@ -194,14 +197,20 @@ def process(msg1, msg2, msg3, msg4, msg5):
         num_batches += 1
         attributes = { k:v for k,v in last_article.items() if k in ['website','date','columns']}
         attributes['media'] = media
+<<<<<<< HEAD
         attributes['today_str'] = today_date
+=======
+>>>>>>> 59fe1471b368a62934ab846ad04dfc3bdcb1c042
         attributes['message.indexBatch'] = i
         attributes['message.countBatch'] = num_spiders
         attributes['message.lastBatch'] = True if  i+1 == num_spiders else False
 
         df = pd.DataFrame(articles_list)
         df  = df.drop_duplicates(subset=['text_id'])
+<<<<<<< HEAD
         df = df[['media','date','text_id','title','rubric','url','paywall','num_characters','text']]
+=======
+>>>>>>> 59fe1471b368a62934ab846ad04dfc3bdcb1c042
 
         msg = api.Message(attributes=attributes, body=df)
         api.send(outports[1]['name'], msg)

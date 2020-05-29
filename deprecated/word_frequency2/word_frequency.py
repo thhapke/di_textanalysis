@@ -95,7 +95,7 @@ except NameError:
 blacklist = list()
 last_msg = None
 word_counter = Counter()
-hash_list = dict()
+id_set = dict()
 
 def setup(msg):
     global blacklist
@@ -155,7 +155,7 @@ def process(msg):
     global blacklist
     global last_msg
     global word_counter
-    global hash_list
+    global id_set
 
     logger, log_stream = slog.set_logging('word_frequency', loglevel=api.config.debug_mode)
     logger.info("Process started")

@@ -83,7 +83,11 @@ keywords = list()
 lexicon = None
 lexicon_stem = None
 last_msg = None
+<<<<<<< HEAD
 hash_list = list()
+=======
+id_set = list()
+>>>>>>> 59fe1471b368a62934ab846ad04dfc3bdcb1c042
 operator_name = 'word_extraction'
 
 
@@ -184,7 +188,11 @@ def check_for_setup(logger, msg) :
 def process(msg):
     global blacklist
     global last_msg
+<<<<<<< HEAD
     global hash_list
+=======
+    global id_set
+>>>>>>> 59fe1471b368a62934ab846ad04dfc3bdcb1c042
 
     logger, log_stream = slog.set_logging(operator_name, api.config.debug_mode)
 

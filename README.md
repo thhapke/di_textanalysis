@@ -47,7 +47,7 @@ Nonetheless I wanted to compare this with another, lexicographical technique sum
 For the tokenization of the text we are using the open source framework [spaCy](https://spacy.io). For us it seemed to be the most advanced tool with the best performance. During the project we learnt that the most maintainable pipeline is to split the task into smaller processing steps:
 
 1. **Pre-processing** (operator: Doc Prepare)  - formating the text, removing tags and common typos and converting it into our 'standard' format: 'text_id', 'language' and 'text' with data type DataFrame
-2. **Word-bags** (operator: Words from Text) - Tokenizing the text and creating word bags of different types
+2. **Words-Text** (operator: Words from Text) - Tokenizing the text and creating word bags of different types
 3. **Blacklist** (operator: Remove Blacklisted) - Removing words that are on a 'blacklist' because they are very common and spoil the outcome. Optional step. 
 4. **Remove pattern** (operator: Regex on Words) - Remove words with certain patterns that have not been removed in the *pre-processing* step or replace pattern. Although they are mostly quite rare they could unnecessaryly populate the Database. 
 5. **Lexicon** (operator: Lexicon words) - Map words according to the lexicon file to predefined keywords, synonyms, etc. 
@@ -70,6 +70,17 @@ The final pipeline looks quite complex but is nonetheless a straightforward proc
 
 ![word index pipeline](./images/word_index_pipeline.png)
 
+Of course you can separate the first 2 steps ('pre-processing' and 'words from text') that are time consuming from the following ones ('blacklist', 'remove patterns' and 'lexicon') that could basically run on the resulting word index (HANA table). In particular the lexicon step where groups of words with similiar meanings can be built, is a candidate for rerun. E.g. based on the first analysis result you conclude it would make sense to have one word for the abbreviations and the spelt out words or 'Corona' instead of 'Corona-Virus', 'Covid-19', 'Corona-Pandemie', etc. 
+
+
+### Words from Text
+The core process of indexing is incorporated in the operator **Words from Text** where the spaCy framework is used: 
+
+1. The text is broken up into tokens (words), 
+2. the grammar type of the tokens are identified (proper nouns, nouns, verbs, adjectives, ..) and 
+3. the entity types of the tokens/proper nouns are proposed (person, location, organization)
+
+This process steps depends on the quality of the models of the language that is been used. For some languages more than one model is available. Of course the outcome could be used to improve the chosen model and the spacy documentation tells you how to do it.    
 
 
 # Github Structure
@@ -80,36 +91,6 @@ This repository has the following structure:
 * **/solution** - containing the solution packages for the dockerfile, pipelines and operators. Each operator has a rudimentary documentation yet generated from the operator-code
 * **/data_repository** - example data to test the operators
 
-## Quadruple Jump of Text Analysis
-The four parts of a text analysis are
-
-1. Getting the corpus/corpora, texts that needs to be analysed 
-2. Preparing the texts before funneling them into the analyse pipeline. Example: to add a language attribute, removing formating tags or correcting common format error like missing space between ending quotes and dots.
-3. Identifying the words as tokens (space/dot/... separated) , grammatical and lematized items (verb, adjective, noun, ..) and as entities carrying some semantics like being a person, location or organization. 
-4. Cleansing the resulting words by applying heuristics like blacklisted words that should be removed, pattern recognitions and lexicographical mappings. 
-
-The result can be used for automatically **indexing texts**, finding **trends of words** or entities that are mentioned more frequently over time or finally identifying **topics**. Topics are set of words that appear together numerously in different texts.
-
-or for saving the metadata of the article in a *HANA DB* table as reference
-
-### Identifying Words as Grammatical and Semantic Entities
-* **word_index** operator using spacy for tokenizing, lemmatising and further cleasing the text by heuristic rules and using a *blacklist-file* for words to be ommitted. A *lexicon.csv* can be used to map the words according to the lexicon lists. The result is stored as an index in a HANA DB table. 
-
-### Detecting Sentiment Scoring 
-* **sentiment analysis** to provide the *sentiment and subjectivity polarity* of the articles acccording to the used words
-
-### Identifying Topics 
-* **topic finding** operator uses an Latent Dirichlet Allocation algorithm to find word clusters that could interpreted as *topics*
-
-
-
-# Short Introduction into Text Analysis
-Text analysis examines a larger amount of texts (= 'corpora') by using a number of algorithms in order to extract information from it. The basic level is to divide the text into **tokens** and then into **words** with its grammatical attributes. From there you can apply the next level of analytical methods to classify the text according e.g. to the sentiment, subjectivity or topic. 
-
-With lemmatized words (inflected form) and the identified type or grammatical position, an index can be build up, e.g. using all nouns or proper nouns like in a book index. Furthermore a dictionary can be used to kind of normalize the words into language independent keywords, e.g. 
-'legal' <- legal, justice, judge, lawyer .. for English or <- gesetzlich, Richter, Gericht, Anwalt, ... for German.  
-
-**Topics** are the next analytical level by putting words into a set. This can be either done by definition or in algorithmic terminology by searching for word clusters. That means e.g. that news articles can be categorized into 'primaries in US', 'US-China-Relationship', 'Brexit', ...
 
  
 

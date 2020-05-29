@@ -4,8 +4,8 @@
     "inports": [
         {
             "name": "articles",
-            "type": "message.dicts",
-            "description": "Message with body as dictionary."
+            "type": "message.DataFrame",
+            "description": "Message with body as DataFrame."
         }
     ],
     "outports": [
@@ -15,13 +15,8 @@
             "description": "Logging data"
         },
         {
-            "name": "table",
-            "type": "message.table",
-            "description": "table of metadata arcticles"
-        },
-        {
             "name": "data",
-            "type": "message",
+            "type": "message.DataFrame",
             "description": "Output metadata of articles"
         }
     ],

@@ -147,17 +147,30 @@ def process(msg):
     # word type
     word_types = tfp.read_list(api.config.word_types)
     if not word_types :
+<<<<<<< HEAD
         word_types = list(df['type'].unique())
+=======
+        word_types = list(df['TYPE'].unique())
+>>>>>>> 59fe1471b368a62934ab846ad04dfc3bdcb1c042
 
     # Language filter
     language_filter = tfp.read_list(api.config.language_filter)
     if not language_filter :
+<<<<<<< HEAD
         language_filter = list(df['language'].unique())
 
     df = df.loc[(df['type'].isin(word_types)) & (df['language'].isin(language_filter)) & (~df['word'].isin(blacklist)) ]
 
     # test for duplicates
     dup_s = df.duplicated(subset=['text_id','language','type','word']).value_counts()
+=======
+        language_filter = list(df['LANGUAGE'].unique())
+
+    df = df.loc[(df['TYPE'].isin(word_types)) & (df['LANGUAGE'].isin(language_filter)) & (~df['WORD'].isin(blacklist)) ]
+
+    # test for duplicates
+    dup_s = df.duplicated(subset=['ID','LANGUAGE','TYPE','WORD']).value_counts()
+>>>>>>> 59fe1471b368a62934ab846ad04dfc3bdcb1c042
     num_duplicates = dup_s[True] if True in dup_s  else 0
     logger.info('Duplicates: {} / {}'.format(num_duplicates, df.shape[0]))
 
@@ -201,9 +214,21 @@ def test_operator():
     process(msg)
 
     # saving outcome as word index
+<<<<<<< HEAD
     out_file = '/Users/Shared/data/onlinemedia/data/word_extraction_regex_blacklist.csv'
     df_list = [d.body for d in api.queue]
     pd.concat(df_list).to_csv(out_file, index=False)
+=======
+
+
+    with open('/Users/Shared/data/onlinemedia/data/word_extraction_regex_blacklist.csv', 'w') as f:
+        writer = csv.writer(f)
+        cols = ['HASH_TEXT', 'LANGUAGE', 'TYPE', 'WORD', 'COUNT']
+        writer.writerow(cols)
+        for msg in api.queue:
+            for rec in msg.body:
+                writer.writerow(rec)
+>>>>>>> 59fe1471b368a62934ab846ad04dfc3bdcb1c042
 
 
 if __name__ == '__main__':

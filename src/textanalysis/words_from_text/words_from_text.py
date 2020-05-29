@@ -221,7 +221,11 @@ outports = [{'name': 'log', 'type': 'string', "description": "Logging data"}, \
             {'name': 'data', 'type': 'message.DataFrame', "description": "Table with word index"}]
 
 #api.set_port_callback(inports[0]['name'], setup_sentiment_list)
+<<<<<<< HEAD
 #api.set_port_callback(inports[1]['name'], process)
+=======
+#api.set_port_callback(inports[0]['name'], process)
+>>>>>>> 59fe1471b368a62934ab846ad04dfc3bdcb1c042
 
 
 def test_operator():
