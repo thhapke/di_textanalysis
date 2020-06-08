@@ -44,9 +44,9 @@
         "$type": "http://sap.com/vflow/textanalysis.scrapy.configSchema.json",
         "script": "file://scrapy.py",
         "debug_mode": true,
-        "spider": "Spiegel_spider",
-        "scrapy_dir": "/Users/d051079/OneDrive - SAP SE/GitHub/Docker/scrapy/onlinemedia",
-        "project_dir": "onlinemedia"
+        "spider": "None",
+        "scrapy_dir": "None",
+        "project_dir": "None"
     },
     "tags": {
         "pandas": "",

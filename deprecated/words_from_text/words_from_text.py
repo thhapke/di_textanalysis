@@ -54,7 +54,7 @@ except NameError:
             config_params = dict()
             tags = {'sdi_utils': '', 'spacy': ''}
             version = "0.0.18"
-            operator_name = "words_from_text"
+            operator_name = "text_words"
             operator_description = "Words from Text"
             operator_description_long = "Extracts words from text for further analysis."
             add_readme = dict()
@@ -91,7 +91,7 @@ id_set = set()
 def process(msg):
     global id_set
 
-    operator_name = 'words_from_text'
+    operator_name = 'text_words'
     logger, log_stream = slog.set_logging(operator_name, api.config.debug_mode)
 
     logger.info("Main Process started. Logging level: {}".format(logger.level))

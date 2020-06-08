@@ -40,7 +40,7 @@ except NameError:
             ## Meta data
             config_params = dict()
             tags = {'sdi_utils': '','pandas': ''}
-            version = "0.0.18"
+            version = "0.1.0"
             operator_name = "word_frequency"
             operator_description = "Word Frequency"
             operator_description_long = "Calculates word frequency"
@@ -122,7 +122,7 @@ if __name__ == '__main__':
         subprocess.run(["rm",'-r','/Users/d051079/OneDrive - SAP SE/GitHub/di_textanalysis/solution/operators/textanalysis_' + api.config.version])
         gs.gensolution(os.path.realpath(__file__), api.config, inports, outports)
         solution_name = api.config.operator_name+'_'+api.config.version
-        subprocess.run(["vctl", "solution", "bundle", '/Users/d051079/OneDrive - SAP SE/GitHub/di_textanalysis/solution/operators/textanalysis_0.0.18',\
+        subprocess.run(["vctl", "solution", "bundle", '/Users/d051079/OneDrive - SAP SE/GitHub/di_textanalysis/solution/operators/textanalysis_' + api.config.version,\
                                   "-t", solution_name])
         subprocess.run(["mv", solution_name+'.zip', '../../../solution/operators'])
 

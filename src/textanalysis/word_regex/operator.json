@@ -16,8 +16,8 @@
         },
         {
             "name": "removed",
-            "type": "message.DataFrame",
-            "description": "Removed words"
+            "type": "message",
+            "description": "Removed words csv formatted"
         },
         {
             "name": "data",
@@ -31,8 +31,8 @@
         "debug_mode": true,
         "word_types": "PROPN",
         "language_filter": "None",
-        "pattern_word_removal": null,
-        "pattern_substring_replace": null
+        "pattern_word_removal": "None",
+        "pattern_substring_replace": "None"
     },
     "tags": {
         "sdi_utils": "",

@@ -41,10 +41,10 @@ except NameError:
             ## Meta data
             config_params = dict()
             tags = {'sdi_utils': ''}
-            version = "0.0.18"
+            version = "0.1.0"
             operator_name = "doc_prepare"
             operator_description = "Doc Prepare"
-            operator_description_long = "Prepares documents read from DB by select the values and remove formats."
+            operator_description_long = "Prepares documents read from storage by select the values and remove formats."
             add_readme = dict()
 
             debug_mode = True
@@ -131,8 +131,11 @@ def process(msg):
 
 
     # remove duplicates
+    prev_num_rows = df.shape[0]
     df.drop_duplicates(subset = ['text_id'],inplace = True)
     df = df.loc[~df['text_id'].isin(ID_set)]
+    post_num_rows = df.shape[0]
+    logger.debug('Docs reduced due to be already processed: {} - {}'.format(prev_num_rows, post_num_rows))
     ID_set.update(df.text_id.values.tolist())
 
     # replace html tags
@@ -180,13 +183,15 @@ def test_operator():
 
 
 if __name__ == '__main__':
-    #test_operator()
+    test_operator()
 
     if True :
-        subprocess.run(["rm",'-r','/Users/d051079/OneDrive - SAP SE/GitHub/di_textanalysis/solution/operators/textanalysis_' + api.config.version])
+        solution_name = api.config.operator_name + '_' + api.config.version
+        path = os.path.join('/Users/d051079/OneDrive - SAP SE/GitHub/di_textanalysis/solution/operators/',solution_name)
+        subprocess.run(["rm",'-r','/Users/d051079/OneDrive - SAP SE/GitHub/di_textanalysis/solution/operators/' + api.config.version])
         gs.gensolution(os.path.realpath(__file__), api.config, inports, outports)
-        solution_name = api.config.operator_name+'_'+api.config.version
-        subprocess.run(["vctl", "solution", "bundle", '/Users/d051079/OneDrive - SAP SE/GitHub/di_textanalysis/solution/operators/textanalysis_0.0.18',\
+
+        subprocess.run(["vctl", "solution", "bundle", '/Users/d051079/OneDrive - SAP SE/GitHub/di_textanalysis/solution/operators/textanalysis_' + api.config.version,\
                                   "-t", solution_name])
         subprocess.run(["mv", solution_name+'.zip', '../../../solution/operators'])
 

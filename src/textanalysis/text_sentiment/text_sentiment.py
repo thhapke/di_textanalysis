@@ -46,10 +46,10 @@ except NameError:
             ## Meta data
             config_params = dict()
             tags = {'sdi_utils': '','textblob':''}
-            version = "0.0.18"
+            version = "0.1.0"
             operator_name = "text_sentiment"
             operator_description = "Text Sentiment Analysis"
-            operator_description_long = "Text Sentiment Analysis using lexicographic approach. "
+            operator_description_long = "Text Sentiment Analysis using Textblob. "
             add_readme = dict()
             debug_mode = True
             config_params['debug_mode'] = {'title': 'Debug mode',
@@ -125,12 +125,12 @@ def test_operator():
     pd.concat(df_list).to_csv(out_file,index=False)
 
 if __name__ == '__main__':
-    test_operator()
+    #test_operator()
     if True:
         subprocess.run(["rm",'-r','/Users/d051079/OneDrive - SAP SE/GitHub/di_textanalysis/solution/operators/textanalysis_' + api.config.version])
         gs.gensolution(os.path.realpath(__file__), api.config, inports, outports)
         solution_name = api.config.operator_name+'_'+api.config.version
-        subprocess.run(["vctl", "solution", "bundle", '/Users/d051079/OneDrive - SAP SE/GitHub/di_textanalysis/solution/operators/textanalysis_0.0.18',\
+        subprocess.run(["vctl", "solution", "bundle", '/Users/d051079/OneDrive - SAP SE/GitHub/di_textanalysis/solution/operators/textanalysis_' + api.config.version,\
                                   "-t", solution_name])
         subprocess.run(["mv", solution_name+'.zip', '../../../solution/operators'])
 

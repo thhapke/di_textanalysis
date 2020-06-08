@@ -44,7 +44,7 @@ except NameError:
             ## Meta data
             config_params = dict()
             tags = {'sdi_utils': '', 'pandas': ''}
-            version = "0.0.18"
+            version = "0.1.0"
             operator_name = "word_blacklist"
             operator_description = "Remove Blacklisted Words"
             operator_description_long = "Remove Blacklisted Words"
@@ -138,7 +138,7 @@ def process(msg):
         api.send(outports[0]['name'], log_stream.flush())
         return 0
 
-    logger.info("Main Process started. Logging level: {}".format(logger.level))
+    logger.info("Process started. Logging level: {}".format(logger.level))
     time_monitor = tp.progress()
 
     att_dict = msg.attributes
@@ -147,32 +147,20 @@ def process(msg):
     # word type
     word_types = tfp.read_list(api.config.word_types)
     if not word_types :
-<<<<<<< HEAD
         word_types = list(df['type'].unique())
-=======
-        word_types = list(df['TYPE'].unique())
->>>>>>> 59fe1471b368a62934ab846ad04dfc3bdcb1c042
 
     # Language filter
     language_filter = tfp.read_list(api.config.language_filter)
     if not language_filter :
-<<<<<<< HEAD
         language_filter = list(df['language'].unique())
 
-    df = df.loc[(df['type'].isin(word_types)) & (df['language'].isin(language_filter)) & (~df['word'].isin(blacklist)) ]
+    df = df.loc[~(df['type'].isin(word_types) & df['language'].isin(language_filter) & df['word'].isin(blacklist)) ]
 
     # test for duplicates
     dup_s = df.duplicated(subset=['text_id','language','type','word']).value_counts()
-=======
-        language_filter = list(df['LANGUAGE'].unique())
-
-    df = df.loc[(df['TYPE'].isin(word_types)) & (df['LANGUAGE'].isin(language_filter)) & (~df['WORD'].isin(blacklist)) ]
-
-    # test for duplicates
-    dup_s = df.duplicated(subset=['ID','LANGUAGE','TYPE','WORD']).value_counts()
->>>>>>> 59fe1471b368a62934ab846ad04dfc3bdcb1c042
     num_duplicates = dup_s[True] if True in dup_s  else 0
     logger.info('Duplicates: {} / {}'.format(num_duplicates, df.shape[0]))
+    logger.info('End process: {}'.format(time_monitor.elapsed_time()))
 
     api.send(outports[1]['name'], api.Message(attributes=att_dict, body=df))
     api.send(outports[0]['name'],log_stream.getvalue())
@@ -214,21 +202,10 @@ def test_operator():
     process(msg)
 
     # saving outcome as word index
-<<<<<<< HEAD
     out_file = '/Users/Shared/data/onlinemedia/data/word_extraction_regex_blacklist.csv'
     df_list = [d.body for d in api.queue]
     pd.concat(df_list).to_csv(out_file, index=False)
-=======
 
-
-    with open('/Users/Shared/data/onlinemedia/data/word_extraction_regex_blacklist.csv', 'w') as f:
-        writer = csv.writer(f)
-        cols = ['HASH_TEXT', 'LANGUAGE', 'TYPE', 'WORD', 'COUNT']
-        writer.writerow(cols)
-        for msg in api.queue:
-            for rec in msg.body:
-                writer.writerow(rec)
->>>>>>> 59fe1471b368a62934ab846ad04dfc3bdcb1c042
 
 
 if __name__ == '__main__':
@@ -238,7 +215,7 @@ if __name__ == '__main__':
         subprocess.run(["rm",'-r','/Users/d051079/OneDrive - SAP SE/GitHub/di_textanalysis/solution/operators/textanalysis_' + api.config.version])
         gs.gensolution(os.path.realpath(__file__), api.config, inports, outports)
         solution_name = api.config.operator_name+'_'+api.config.version
-        subprocess.run(["vctl", "solution", "bundle", '/Users/d051079/OneDrive - SAP SE/GitHub/di_textanalysis/solution/operators/textanalysis_0.0.18',\
+        subprocess.run(["vctl", "solution", "bundle", '/Users/d051079/OneDrive - SAP SE/GitHub/di_textanalysis/solution/operators/textanalysis_'+ api.config.version,\
                                   "-t", solution_name])
         subprocess.run(["mv", solution_name+'.zip', '../../../solution/operators'])
 

@@ -24,8 +24,8 @@
         "$type": "http://sap.com/vflow/textanalysis.word_frequency_sql.configSchema.json",
         "script": "file://word_frequency_sql.py",
         "debug_mode": true,
-        "language": "DE",
-        "type": "NLP",
+        "language": null,
+        "type": null,
         "min_count": 1
     },
     "tags": {

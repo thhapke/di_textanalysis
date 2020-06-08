@@ -87,9 +87,14 @@ This process steps depends on the quality of the models of the language that is 
 
 This repository has the following structure: 
 
-* **/src** - contains the code of all di_textanalyis operators that can be modiefied and tested locally and uploaded using the *gensolution-package* ([on github](https://github.com/thhapke/sdi_utils)) or [pypi.org](https://pypi.org/project/sdi-utils/)
+* **/src** - contains the code of all di_textanalyis operators that can be modified and tested locally and uploaded using the *gensolution-package* ([on github](https://github.com/thhapke/sdi_utils)) or [pypi.org](https://pypi.org/project/sdi-utils/). Each src-file contains also code that produces a ready-to-upload solution package stored to the solution directory
 * **/solution** - containing the solution packages for the dockerfile, pipelines and operators. Each operator has a rudimentary documentation yet generated from the operator-code
-* **/data_repository** - example data to test the operators
+* **/data_repository** - example data to test the operators and run the solution like blacklist.txt, lexicon.csv, sentiments_DE.csv
+* **/images** - with screenshots and icons
+* **/jnb** - Jupyter Notebooks for analysing the result
+* **/utils** - Code that helped for the project but not belong to the core
+* **/word-in-progress** - Code the could become part of the 'core' but are still in development, e.g.  here you find code to detect topics in texts. 
+* **/sql** - sql-statement for creating the target tables in HANA. 
 
 
  
