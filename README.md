@@ -1,3 +1,6 @@
+### Attention
+Due to unnoticed sync fight between Microsoft OneDrive and Github Desktop some code was scrambled. I tried to clean up the mess but there still be some rem
+
 # Text Analysis Framework deployed on SAP Data Intelligence
 
 ## Introduction
