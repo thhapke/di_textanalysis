@@ -233,7 +233,7 @@ inports = [{'name': 'spider', 'type': 'message.file', "description": "spider.py 
 outports = [{'name': 'log', 'type': 'string', "description": "logging"}, \
             {"name": "data", "type": "message.DataFrame", "description": "data"}]
 
-#api.set_port_callback([inports[0]['name'], inports[1]['name'], inports[2]['name'], inports[3]['name'], inports[4]['name']], process)
+api.set_port_callback([inports[0]['name'], inports[1]['name'], inports[2]['name'], inports[3]['name'], inports[4]['name']], process)
 
 
 def test_operator():
@@ -272,14 +272,3 @@ def test_operator():
 
 
 
-if __name__ == '__main__':
-    test_operator()
-    if True:
-        subprocess.run(["rm", '-r',
-                        '/Users/d051079/OneDrive - SAP SE/GitHub/di_textanalysis/solution/operators/textanalysis_' + api.config.version])
-        gs.gensolution(os.path.realpath(__file__), api.config, inports, outports)
-        solution_name = api.config.operator_name + '_' + api.config.version
-        subprocess.run(["vctl", "solution", "bundle",
-                        '/Users/d051079/OneDrive - SAP SE/GitHub/di_textanalysis/solution/operators/textanalysis_' + api.config.version, \
-                        "-t", solution_name])
-        subprocess.run(["mv", solution_name + '.zip', '/Users/d051079/OneDrive - SAP SE/GitHub/di_textanalysis/solution/operators'])

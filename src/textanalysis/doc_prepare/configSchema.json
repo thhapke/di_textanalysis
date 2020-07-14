@@ -43,6 +43,11 @@
             "title": "Media articles",
             "description": "Name of media article determines language.",
             "type": "boolean"
+        },
+        "pattern_substring_replace": {
+            "title": "Regular expression patterns for replacement",
+            "description": "Regular expression patterns for replacing substrings in text",
+            "type": "string"
         }
     }
 }

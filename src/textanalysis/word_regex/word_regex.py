@@ -93,11 +93,13 @@ def process(msg):
         api.send(outports[2]['name'], api.Message(attributes=att_dict, body=df))
         return 0
 
-    df['word_m'] = np.nan
-    df['word_r'] = np.nan
-
+    # in case the input is from a DB
     df.rename(columns = {'TEXT_ID':'text_id','LANGUAGE':'language','TYPE':'type','WORD':'word','COUNT':'count'},inplace=True)
     logger.debug('DataFrame columns: {}'.format(df.columns))
+
+    df['word_m'] = np.nan
+    df['word_r'] = np.nan
+    df['word_orig'] = df['word']
 
     # word type
     word_types = tfp.read_list(api.config.word_types)
@@ -136,7 +138,7 @@ def process(msg):
             df.loc[mask,'word'] = df.loc[mask,'word'].str.replace(pat[0],pat[1],regex = True)
 
     # send removed or replace words to port removed
-    rm_df= df.loc[df[['word_r','word_m']].any(axis=1),['word','word_r','word_m']].drop_duplicates()
+    rm_df= df.loc[df[['word_r','word_m']].any(axis=1),['word_orig','word','word_r','word_m']].drop_duplicates()
     rm_csv = rm_df.to_csv(index=False)
     attributes_removed = att_dict.copy()
     attributes_removed['port'] = outports[1]['name']

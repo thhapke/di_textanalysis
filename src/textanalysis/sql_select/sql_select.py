@@ -44,11 +44,11 @@ except NameError:
         class config:
             ## Meta data
             config_params = dict()
-            tags = {'sdi_utils': '', 'spacy': ''}
+            tags = {'sdi_utils': ''}
             version = "0.1.0"
-            operator_name = "sql_word_index"
-            operator_description = "sql word index"
-            operator_description_long = "Creates SQL statement for creating a word _index from text_word."
+            operator_name = "sql_select"
+            operator_description = "sql select"
+            operator_description_long = "Creates select statement from columns and table."
             add_readme = dict()
 
             debug_mode = True
@@ -56,54 +56,37 @@ except NameError:
                                            'description': 'Sending debug level information to log port',
                                            'type': 'boolean'}
 
-            language = 'DE'
-            config_params['language'] = {'title': 'Language',
-                                               'description': 'Language for which the index should be created.',
-                                               'type': 'string'}
 
-            text_id_col = 'TEXT_ID'
-            config_params['text_id_col'] = {'title': 'Text_id column',
-                                           'description': 'Name of text_id column',
+            columns = 'ID, TEXT_ID'
+            config_params['columns'] = {'title': 'Columns to select',
+                                           'description': 'Columns to select',
                                            'type': 'string'}
 
-            table_name = 'WORD_TEXT'
+            table_name = 'DOCS'
             config_params['table_name'] = {'title': 'Table name',
                                            'description': 'Name of table',
-                                           'type': 'string'}
-
-            type_limit_map = 'LEX: 1, PROPN: 5, PER:2, ORG:2, LOC:2'
-            config_params['type_limit_map'] = {'title': 'Limit of each type',
-                                           'description': 'Minimum frequency of words for each type (map)',
                                            'type': 'string'}
 
 
 
 def process():
 
-    operator_name = 'sql_word_index'
+    operator_name = 'sql_select'
     logger, log_stream = slog.set_logging(operator_name, api.config.debug_mode)
     logger.info("Main Process started. Logging level: {}".format(logger.level))
     time_monitor = tp.progress()
 
-    language = tfp.read_value(api.config.language)
-    type_limit = tfp.read_dict(api.config.type_limit_map)
-    table_name = tfp.read_value(api.config.table_name)
-    text_id_col = tfp.read_value(api.config.text_id_col)
+    columns = api.config.columns
+    table_name = api.config.table_name
 
-    for i, [wtype, limit] in enumerate(type_limit.items()) :
-        sql_s = "SELECT {tid}, \"{tn}\".LANGUAGE, \"{tn}\".TYPE, \"{tn}\".WORD, COUNT FROM \"{tn}\" INNER JOIN"\
-                "(SELECT WORD, TYPE, LANGUAGE, SUM(COUNT) as CUMS FROM \"{tn}\" "\
-                "WHERE LANGUAGE = \'{lang}\' AND TYPE = \'{wt}\' "\
-                "GROUP BY WORD, TYPE, LANGUAGE) AS CTABLE ON "\
-                "\"{tn}\".WORD = CTABLE.WORD AND \"{tn}\".TYPE = CTABLE.TYPE AND \"{tn}\".LANGUAGE = CTABLE.LANGUAGE "\
-                "WHERE CUMS >= {lt}".format(tid = text_id_col,tn = table_name,lang=language,wt = wtype,lt=limit)
+    sql_statement = 'SELECT {} FROM {}'.format(columns, table_name)
 
-        lastbatch = True if len(type_limit) == i+1 else False
-        att_dict = attributes={'operator':operator_name,'parameter':{'type':wtype,'limit':limit,'language':language},\
-                               'message.batchIndex':i,'message.batchSize':len(type_limit),'message.lastBatch':lastbatch}
-        msg = api.Message(attributes=att_dict,body = sql_s)
-        api.send(outports[1]['name'], msg)
 
+    att_dict = attributes={'operator':operator_name,'parameter':{'columns':columns,'table':table_name},\
+                               'message.batchIndex':0,'message.batchSize':1,'message.lastBatch':True}
+    msg = api.Message(attributes=att_dict,body = sql_statement)
+
+    api.send(outports[1]['name'], msg)
     api.send(outports[0]['name'], log_stream.getvalue())
 
 
@@ -116,11 +99,9 @@ outports = [{'name': 'log', 'type': 'string', "description": "Logging data"}, \
 
 def test_operator():
 
-    config = api.config
-    config.debug_mode = True
-    config.type_limit_map = 'LEX: 1, PROPN: 5, PER:2, ORG:2, LOC:2'
-    config.language = 'DE'
-    api.set_config(config)
+    api.config.columns =  '"ID", "TEXT_AS_NVARCHAR" as "TEXT"'
+    api.config.debug_mode = True
+    api.config.table_name =  '"${schema}"."bpanceditor.db::news.V_editorInbox_TextAs_nvarchar" where "ARTIFACT_TYPE" not in (\'NEWSTICKER\')'
     process()
 
 if __name__ == '__main__':

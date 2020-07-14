@@ -19,6 +19,8 @@
         "script": "file://sql_word_index.py",
         "debug_mode": true,
         "language": "DE",
+        "text_id_col": "TEXT_ID",
+        "table_name": "WORD_TEXT",
         "type_limit_map": "LEX: 1, PROPN: 5, PER:2, ORG:2, LOC:2"
     },
     "tags": {

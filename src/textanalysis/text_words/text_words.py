@@ -93,13 +93,13 @@ except NameError:
                                            'description': 'Do sentiment analysis using word list.',
                                            'type': 'boolean'}
 
-
 # global variables
 id_set = set()
 list_df = pd.DataFrame()
 att_dict = dict()
 sentiment_words_df = pd.DataFrame()
 operator_name = 'text_words'
+
 
 def setup_sentiment_list(msg):
     global sentiment_words_df
@@ -111,6 +111,7 @@ def setup_sentiment_list(msg):
     api.send(outports[0]['name'], log_stream.getvalue())
     process(None)
 
+
 def process(msg):
     global id_set
     global list_df
@@ -121,28 +122,31 @@ def process(msg):
     logger.info("Main Process started. Logging level: {}".format(logger.level))
     time_monitor = tp.progress()
 
+    if msg:
+        att_dict = msg.attributes
+
     # sync data and setup msg
     # Case: do sentiment AND sentiment_setup not done/msg with data
-    if api.config.sentiments and sentiment_words_df.empty :
+    if api.config.sentiments and sentiment_words_df.empty:
         logger.info('Sentiment word list not setup yet!')
         api.send(outports[0]['name'], log_stream.getvalue())
         att_dict = msg.attributes
-        if list_df.empty :
+        if list_df.empty:
             list_df = msg.body
-        else :
-            list_df = pd.concat(list_df,msg.body)
+        else:
+            list_df = pd.concat(list_df, msg.body)
         return 0
     # Case: Sentiment setup called process and data has been sent previously
     elif msg == None and not list_df.empty:
         df = list_df
     # Case: Sentiment setup called process and data has NOT been sent previously
-    elif msg == None and  list_df.empty:
+    elif msg == None and list_df.empty:
         return 0
     # Case:  data sent and no sentiment analysis is required
-    else :
+    else:
         df = msg.body
 
-    logger.debug('Attributes: {}'.format(msg.attributes))
+    logger.debug('Attributes: {}'.format(att_dict))
     logger.debug('DataFrame: {} - {}'.format(df.shape[0], df.shape[1]))
 
     if df.shape[0] == 0:
@@ -150,24 +154,30 @@ def process(msg):
         return 0
 
         # Remove ID that has been processed
+    # Should already been filtered out by 'Doc Prepare'
+    prev_num_rows = df.shape[0]
     df = df.loc[~df['text_id'].isin(id_set)]
+    post_num_rows = df.shape[0]
+    if prev_num_rows != post_num_rows:
+        logger.warning('Processed text_id has been found:  {} -> {}'.format(prev_num_rows, post_num_rows))
     id_set.update(df['text_id'].unique().tolist())
 
     # Languages
     language_filter = tfp.read_value(api.config.language)
     logger.info('Language filter: {}'.format(language_filter))
-    if not language_filter :
+    if not language_filter:
         language_filter = df['language'].unique().tolist()
-    language_filter = [ lang for lang in language_filter if lang in language_models.keys()]
+    language_filter = [lang for lang in language_filter if lang in language_models.keys()]
     nlp = dict()
-    for lc in language_filter :
+    for lc in language_filter:
         nlp[lc] = spacy.load(language_models[lc])
     df = df.loc[df['language'].isin(language_filter)]
 
     # Warning for languages not supported
-    languages_not_supported =  [ lang for lang in language_filter if not lang in language_models.keys()]
-    if languages_not_supported :
-        logger.warning(('The text of following langauges not analysed due to unsupported language: {}'.format(languages_not_supported)))
+    languages_not_supported = [lang for lang in language_filter if not lang in language_models.keys()]
+    if languages_not_supported:
+        logger.warning(('The text of following langauges not analysed due to unsupported language: {}'.format(
+            languages_not_supported)))
 
     # word types
     types = tfp.read_list(api.config.types)
@@ -179,40 +189,65 @@ def process(msg):
     # Create doc for all
     word_bag_list = list()
     sentiment_list = list()
-    def get_words(id, language, text) :
-        if not isinstance(text,str) :
-            logger.warning(('Record with error - ID: {} - {}'.format(id,text) ))
+
+    def get_words(id, language, text):
+        if not isinstance(text, str):
+            logger.warning(('Record with error - ID: {} - {}'.format(id, text)))
             return -1
         doc = nlp[language](text)
         words = list()
         for t in types:
-            words.extend([[id,language,t,token.lemma_[:api.config.max_word_len]] for token in doc if token.pos_ == t])
+            words.extend(
+                [[id, language, t, token.lemma_[:api.config.max_word_len]] for token in doc if token.pos_ == t])
         for et in entity_types:
-            words.extend([[id,language,et,ent.text[:api.config.max_word_len]] for ent in doc.ents if ent.label_ == et])
+            words.extend(
+                [[id, language, et, ent.text[:api.config.max_word_len]] for ent in doc.ents if ent.label_ == et])
         # sentiment
         if language == 'DE' and api.config.sentiments:
-            lemmatized = [ token.lemma_ for token in doc]
-            ls = sentiment_words_df.loc[sentiment_words_df.index.isin(lemmatized) , 'value']
-            sentiment_list.append([id,round(sentiment_words_df.loc[sentiment_words_df.index.isin(lemmatized) , 'value'].mean(), 2)])
-            logger.debug('Last sentiment: {}'.format(sentiment_list[-1]))
+            # collect all the lemmatized words of text
+            # get all rows from sentiment_words_df and calculate mean
+            lemmatized = [token.lemma_.lower() for token in doc if token.pos_ in ['NOUN', 'VERB', 'ADJ']]
+            # logger.debug('lemmatized words: {}'.format(lemmatized[0:10]))
+            text_sentiment_words = sentiment_words_df.loc[sentiment_words_df.index.isin(lemmatized), 'value']
+            text_sentiment_value = text_sentiment_words.mean()
+            sentiment_list.append([id, text_sentiment_value])
+            # logger.debug('id: {}  #sentiment words: {}   sentitment:{}'.format(id,text_sentiment_words.shape[0],text_sentiment_value))
 
-        word_bag_list.append(pd.DataFrame(words,columns = ['text_id','language','type','word']))
+        word_bag_list.append(pd.DataFrame(words, columns=['text_id', 'language', 'type', 'word']))
 
-    df.apply(lambda x : get_words(x['text_id'],x['language'],x['text']),axis=1)
-
+    df.apply(lambda x: get_words(x['text_id'], x['language'], x['text']), axis=1)
 
     # data message
-    word_bag = pd.concat(word_bag_list)
-    word_bag =  word_bag.loc[word_bag['word'].str.len() >= api.config.min_word_len ]
+    try:
+        word_bag = pd.concat(word_bag_list)
+    except ValueError as ex:
+        logger.error('No words in message: {}'.format(att_dict))
+        api.send(outports[0]['name'], log_stream.getvalue())
+        log_stream.seek(0)
+        log_stream.truncate()
+        return 0
+
+    word_bag = word_bag.loc[word_bag['word'].str.len() >= api.config.min_word_len]
     word_bag['count'] = 1
-    word_bag = word_bag.groupby(['text_id','language','type','word'])['count'].sum().reset_index()
+    word_bag = word_bag.groupby(['text_id', 'language', 'type', 'word'])['count'].sum().reset_index()
+
+    # check for duplicates - should be unnecessary
+    prev_num_rows = word_bag.shape[0]
+    word_bag.drop_duplicates(ignore_index=True, inplace=True)
+    post_num_rows = word_bag.shape[0]
+    if not prev_num_rows == post_num_rows:
+        logger.warning('Duplicates has been found:  {} -> {}'.format(prev_num_rows, post_num_rows))
+        api.send(outports[0]['name'], log_stream.getvalue())
+        log_stream.seek(0)
+        log_stream.truncate()
+
     data_msg = api.Message(attributes=att_dict, body=word_bag)
     logger.info('Labels in document: {}'.format(word_bag['type'].unique().tolist()))
-    logger.debug('DataFrame shape: {} - {}'.format(word_bag.shape[0],word_bag.shape[1]))
+    logger.debug('DataFrame shape: {} - {}'.format(word_bag.shape[0], word_bag.shape[1]))
     api.send(outports[2]['name'], data_msg)
 
     # sentiment message
-    if api.config.sentiments and len(sentiment_list)> 0 :
+    if api.config.sentiments and len(sentiment_list) > 0:
         sentiment_df = pd.DataFrame(sentiment_list, columns=['text_id', 'sentiment'])
         sentiment_df.drop_duplicates(inplace=True)
         sentiment_csv = sentiment_df.to_csv(index=False)
@@ -221,9 +256,6 @@ def process(msg):
 
     # log message
     api.send(outports[0]['name'], log_stream.getvalue())
-
-
-
 
 
 inports = [{'name': 'sentimentlist', 'type': 'message.DataFrame', "description": "Sentiment list"},

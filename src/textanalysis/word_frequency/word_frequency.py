@@ -70,6 +70,13 @@ def process(msg):
     time_monitor = tp.progress()
 
     df = msg.body
+
+    if not isinstance(df, pd.DataFrame) or df.empty:
+        logger.warning('Empty dataframe, no output send!')
+        api.send(outports[0]['name'], log_stream.getvalue())
+        api.send(outports[2]['name'], api.Message(attributes=att_dict, body=df))
+        return 0
+
     df['count'] = df['count'].astype('int32')
 
     # word type

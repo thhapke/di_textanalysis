@@ -1,18 +1,14 @@
-import json
+
 import os
-import csv
 import re
 import pandas as pd
-import pickle
-import collections
 import subprocess
-
-import spacy
 
 import sdi_utils.gensolution as gs
 import sdi_utils.set_logging as slog
 import sdi_utils.textfield_parser as tfp
 import sdi_utils.tprogress as tp
+
 
 
 try:
@@ -33,9 +29,6 @@ except NameError:
             else:
                 # print('{}: {}'.format(port, msg))
                 pass
-
-        def set_config(config):
-            api.config = config
 
         class config:
             ## Meta data
@@ -81,6 +74,13 @@ except NameError:
             config_params['media_docs'] = {'title': 'Media articles',
                                            'description': 'Name of media article determines language.',
                                            'type': 'boolean'}
+
+            pattern_substring_replace = r"'([\:,\.?!\)])([A-Z])' : '\1 \2', '(,)([a-z])': '\1 \2', '(\"\.)([A-Z])': '\1 \2', " \
+                                        r"'(\.)(\"[A-Z])': '\1 \2'"
+
+            config_params['pattern_substring_replace'] = {'title': 'Regular expression patterns for replacement',
+                                                          'description': 'Regular expression patterns for replacing substrings in text',
+                                                          'type': 'string'}
 
 ID_set = set()
 def process(msg):
@@ -129,6 +129,10 @@ def process(msg):
 
     logger.info("Default language: {}".format(default_language))
 
+    # if text is a binary
+    if type(df['text'].iloc[0]) == bytes:
+        logger.info('Text is bytes. Decoded to \'utf-8\'')
+        df.text = df.text.str.decode('utf-8')
 
     # remove duplicates
     prev_num_rows = df.shape[0]
@@ -142,9 +146,20 @@ def process(msg):
     if api.config.remove_html_tags :
         df['text'] = df['text'].str.replace('<.*?>','',regex=True)
 
-    # replace double double quotes
-    df['text'] = df['text'].str.replace('""', '', regex=False)
-    df['text'] = df['text'].str.replace('."', '. "', regex=False)
+    # correct common text format errors
+    #repl_pattern = list()
+    #repl_pattern.append([r'([\:,\.?!\)])([A-Z])',r'\1 \2'])
+    #repl_pattern.append([r'(,)([a-z])', r'\1 \2'])
+    #repl_pattern.append([r'(\"\.)([A-Z])', r'\1 \2'])
+    #repl_pattern.append([r'(\.)(\"[A-Z])', r'\1 \2'])
+
+    repl_pattern = tfp.read_dict(api.config.pattern_substring_replace)
+    repl_pattern = repl_pattern
+    if repl_pattern:
+        logger.info('Apply regex to text: {}'.format(repl_pattern))
+        for pat,repl in repl_pattern.items() :
+            mask = df['text'].str.contains(pat)
+            df.loc[mask,'text'] = df.loc[mask,'text'].str.replace(pat,repl, regex = True)
 
     api.send(outports[0]['name'], log_stream.getvalue())
     api.send(outports[1]['name'], api.Message(attributes=att_dict,body=df[['text_id','language','text']]))
@@ -160,21 +175,43 @@ outports = [{'name': 'log', 'type': 'string', "description": "Logging data"}, \
 def test_operator():
     global labels
 
-    config = api.config
-    config.debug_mode = True
-    config.text_column = 'ARTIFACT_CONTENT.TEXT'
-    config.id_column = 'ID'
-    config.default_language = 'DE'
-    api.set_config(config)
+    if False :
+        api.config.debug_mode = True
+        api.config.text_column = 'ARTIFACT_CONTENT.TEXT'
+        api.config.id_column = 'ID'
+        api.config.default_language = 'DE'
 
-    doc_file = '/Users/Shared/data/onlinemedia/data/print_example.csv'
-    df = pd.read_csv(doc_file,sep='\t',nrows=100000000)
-    msg = api.Message(attributes={'file': {'path': doc_file},'format':'pandas'}, body=df)
-    process(msg)
+        doc_file = '/Users/Shared/data/onlinemedia/data/print_example.csv'
+        df = pd.read_csv(doc_file,sep='\t',nrows=100000000)
+        msg = api.Message(attributes={'file': {'path': doc_file},'format':'pandas'}, body=df)
+        process(msg)
 
-    n_df = df.head(10).copy()
-    msg = api.Message(attributes={'file': {'path': doc_file},'format':'pandas'}, body=n_df)
-    process(msg)
+        n_df = df.head(10).copy()
+        msg = api.Message(attributes={'file': {'path': doc_file},'format':'pandas'}, body=n_df)
+        process(msg)
+        # saving outcome as word index
+        out_file = '/Users/Shared/data/onlinemedia/data/doc_data_cleansed.csv'
+        df_list = [d.body for d in api.queue]
+        pd.concat(df_list).to_csv(out_file, index=False)
+    else :
+        api.config.debug_mode = True
+        api.config.text_column = 'text'
+        api.config.id_column = 'text_id'
+        api.config.default_language = 'DE'
+        api.config.remove_html_tags = False
+
+        doc_list = [[1,'DE','Ein einfacher Test.Richtig geschrieben! Oder ?Doch nicht.'],
+                    [2,'DE','Eher falsch,aber schauen wir mal.Sollte korrigiert werden .'],
+                    [3,'DE',' Und nun " verehrte Leute":Kann man auch das verbessern?."JA"']]
+        df = pd.DataFrame(doc_list,columns=['text_id','language','text'])
+        msg = api.Message(attributes={'file': {'path': 'none'}, 'format': 'pandas'}, body=df)
+        process(msg)
+        df_list = [d.body for d in api.queue]
+        df = pd.concat(df_list)
+        for index, row in df.iterrows() :
+            #print('ORIG: ' + row['texto'])
+            print('NEW : ' + row['text'])
+
 
     # saving outcome as word index
     out_file = '/Users/Shared/data/onlinemedia/data/doc_data_cleansed.csv'

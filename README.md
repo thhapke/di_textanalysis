@@ -43,16 +43,23 @@ Nonetheless I wanted to compare this with another, lexicographical technique sum
 
 ![Sentiment Pipeline](./images/Sentiment_analysis.png)
 
-## Word Index
-For the tokenization of the text we are using the open source framework [spaCy](https://spacy.io). For us it seemed to be the most advanced tool with the best performance. During the project we learnt that the most maintainable pipeline is to split the task into smaller processing steps:
+## Word Analysis
+During the project we learnt that it makes sense to split the task into a 2-staged process: 
+
+1. Get **words** from text
+2. Index **words** by selecting types, cleansing from blurring words and adding mappings to semantically similar words.
+
+This 2-staged approach is reflected by 2 pipelines. 
+
+### Tokenizing the Text
+For splitting the text into grammatical entities the open source framework [spaCy](https://spacy.io) is been used. In addition also the entity detection (person, organization, location) can be applied although only persons delivered results of a satifying level. It is the more time consuming process step and there should not be to much pre-selection added that later would be sorefully regretted. There are basically 2 operators supporting this stage: 
 
 1. **Pre-processing** (operator: Doc Prepare)  - formating the text, removing tags and common typos and converting it into our 'standard' format: 'text_id', 'language' and 'text' with data type DataFrame
 2. **Words-Text** (operator: Words from Text) - Tokenizing the text and creating word bags of different types
-3. **Blacklist** (operator: Remove Blacklisted) - Removing words that are on a 'blacklist' because they are very common and spoil the outcome. Optional step. 
-4. **Remove pattern** (operator: Regex on Words) - Remove words with certain patterns that have not been removed in the *pre-processing* step or replace pattern. Although they are mostly quite rare they could unnecessaryly populate the Database. 
-5. **Lexicon** (operator: Lexicon words) - Map words according to the lexicon file to predefined keywords, synonyms, etc. 
 
-The output of the pipeline is the **word index** that stores 
+All operators are "Custom Python"-operators that can easily be edited. Although the **pre-processing** operator has been designed as generally usable as possible, it is prone for adjustments. Currently 2 kinds of documents has been used as a starter for the design: News articles in a HANA-database having still HTML-tags included and plain text of onlinemedia provided by JSON-documents. 
+
+The output of the pipeline is stored to the database tabel 'word_text' with the following structure: 
 
 * 'text_id' - reference to text, 
 * 'language', 
@@ -60,27 +67,66 @@ The output of the pipeline is the **word index** that stores
 * 'word', 
 * 'count' - number of words in text
 
-into a HANA database. 
+![word text pipeline](./images/Word_text_pipeline.png)
 
-For monitoring purpose the **word frequency** of the processed corpus is also stored to a separate csv-file. This helps to understand if some words should be removed via the *blacklist* or the *remove pattern* step.
 
-For checking if the *remove pattern* step has only removed the intended words and replaced the intended patterns, another csv-file is produced.
+### Indexing Text
+The second one could be either done with sql-statements or for more elaborate processes using python scripts. This provides the flexibility to adjust the text analysis to the desired outcome. There are 4 operators supporting this step: 
 
-The final pipeline looks quite complex but is nonetheless a straightforward process: 
+1. **sql_word_index** - Selecting words from the base word table that has been created in the previous stage. Limits can be passed for each word type to only select words that appears more frequently than the given limit. This constraint eleminates a lot of words, that have passed the pre-selection although containing numbers or special characters. 
+2. **word_regex** - Removing words with certain patterns or replacing patterns. For both configuration parameters "removing" and "replacing" a list of regular expressions can be passed. There is an outport 'removed' that exports the changes of the regular expressions in order to verify that it works like intended. 
+3. **word_blacklist** - Removing words that are on a 'blacklist' because they are very common and contorts the outcome, e.g. the 'country', 'publishing location', 'media'. 
+4. **word_lexicon** - Map words according to the lexicon file to predefined keywords, synonyms, etc. Examples: 'corona', 'corona-virus', 'corona-pandemic' can all be mapped to 'corona'.
+
 
 ![word index pipeline](./images/word_index_pipeline.png)
 
-Of course you can separate the first 2 steps ('pre-processing' and 'words from text') that are time consuming from the following ones ('blacklist', 'remove patterns' and 'lexicon') that could basically run on the resulting word index (HANA table). In particular the lexicon step where groups of words with similiar meanings can be built, is a candidate for rerun. E.g. based on the first analysis result you conclude it would make sense to have one word for the abbreviations and the spelt out words or 'Corona' instead of 'Corona-Virus', 'Covid-19', 'Corona-Pandemie', etc. 
 
+## Docker Image
+Fortunately there is no other installation needed as the package installations with **pip** and therefore the python base image provided by SAP can be used:
 
-### Words from Text
-The core process of indexing is incorporated in the operator **Words from Text** where the spaCy framework is used: 
+ */com.sap.datahub.linuxx86_64/sles:15.0-sap-007* 
+ 
+ The minimum required  docker file would then be look like: 
+ 
+```
+FROM §/com.sap.datahub.linuxx86_64/sles:15.0-sap-007
 
-1. The text is broken up into tokens (words), 
-2. the grammar type of the tokens are identified (proper nouns, nouns, verbs, adjectives, ..) and 
-3. the entity types of the tokens/proper nouns are proposed (person, location, organization)
+# basic setup with additional user
+RUN groupadd -g 1972 textanalysis && useradd -g 1972 -u 1972 -m textanalysis
+USER 1972:1972
+WORKDIR "/home/textanalysis"
+ENV HOME=/home/textanalysis
+ENV PATH="${PATH}:${HOME}/.local/bin"
 
-This process steps depends on the quality of the models of the language that is been used. For some languages more than one model is available. Of course the outcome could be used to improve the chosen model and the spacy documentation tells you how to do it.    
+# Main packages for text analysis
+# scrapy, pandas, spacy, nltk and requests (optional)
+RUN python3 -m pip install scrapy --user
+RUN python3 -m pip --no-cache-dir install pandas --user
+RUN python3 -m pip --no-cache-dir install nltk --user
+RUN python3 -m pip --no-cache-dir install spacy --user
+RUN python3 -m pip --no-cache-dir install requests --user 
+
+# utilies for operator development provided by thorsten hapke
+RUN python3 -m pip --no-cache-dir install sdi_utils >=0.0.77 --user
+
+# pre installation of languages
+RUN python3 -m spacy download de_core_news_sm --user
+RUN python3 -m spacy download fr_core_news_sm --user
+RUN python3 -m spacy download es_core_news_sm --user
+RUN python3 -m spacy download en_core_web_sm --user
+RUN python3 -m pip --no-cache-dir install textblob --user
+RUN python3 -m pip --no-cache-dir install textblob-de --user
+RUN python3 -m pip --no-cache-dir install textblob-fr --user
+  
+```
+
+If you read the log-file created by scrapy you might see a warning: 
+
+```
+WARNING: /home/textanalysis/.local/lib/python3.6/site-packages/pandas/compat/__init__.py:117: UserWarning: Could not import the lzma module. Your installed Python is incomplete. Attempting to use lzma compression will result in a RuntimeError.
+```
+So far I have not seen any impact. Of course you can install the lzma package with zypper but then you have to change the base image to : opensuse/leap:15.0.
 
 
 # Github Structure
