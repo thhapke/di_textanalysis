@@ -10,7 +10,7 @@ There are basically 2 approaches for doing a text analysis:
 1. Brute force blackbox single step approach or 
 2. Step-by-step
 
-The brute force approach is using a text as a whole and classifies the text by using 'Deep Learning' techniques. The most familiar classifications are the **sentiment** and **subjectivity** polarity. Based on the type of the corpus the result could be quite good even for short texts like in twitter or movie and product reviews. But due to the very nature of language of being able to convey all kinds of information in numerous ways and that you need mostly an extensive amount of trained data this approach is of limited practicality.
+The brute force approach is using a text as a whole and classifies the text by using 'Deep Learning' techniques. The most familiar classifications are the **sentiment** and **subjectivity** polarity. Based on the type of the corpus the result could be quite good even for short texts like in twitter or movie and product reviews. But due to the very nature of language of being able to convey all kinds of information in numerous ways and because you need mostly an extensive amount of trained data this approach is of limited practicality.
 
 The second step-by-step approach could also use models trained by *deep learning* techniques but in a more controlled way and combined with other techniques in a kind of process pipeline. For example for the grammatical analysis a deep learning trained model could be of great use to create word bags that can subsequently been evaluated to find similiar topics in texts by applying cluster algorithms. 
 
