@@ -1,5 +1,5 @@
 ### Attention
-Due to unnoticed sync fight between Microsoft OneDrive and Github Desktop some code was scrambled. I tried to clean up the mess but there still be some rem
+Due to unnoticed sync fight between Microsoft OneDrive and Github Desktop some code was scrambled. I tried to clean up the mess but there might still be some remnants left. 
 
 # Text Analysis Framework deployed on SAP Data Intelligence
 
@@ -121,7 +121,9 @@ RUN python3 -m spacy download en_core_web_sm --user
 RUN python3 -m pip --no-cache-dir install textblob --user
 RUN python3 -m pip --no-cache-dir install textblob-de --user
 RUN python3 -m pip --no-cache-dir install textblob-fr --user
-  
+
+# create the scrapy environment
+RUN scrapy startproject onlinemedia
 ```
 
 If you read the log-file created by scrapy you might see a warning: 
