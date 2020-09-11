@@ -65,6 +65,10 @@ spider = [media]_spider.py', 'type': 'string'}
                 'Scrapy project directory on container', 'type': 'string'}
 
 
+media_languages = {'Lefigaro':'FR', 'Lemonde':'FR','Elpais':'ES','Elmundo':'ES','Spiegel':'DE','Sueddeutsche':'DE',\
+                   'FAZ':'DE'}
+
+
 ###
 # Format output from captured scrape stdout
 ###
@@ -194,10 +198,16 @@ def process(msg1, msg2, msg3, msg4, msg5):
         num_batches += 1
         attributes = { k:v for k,v in last_article.items() if k in ['website','date','columns']}
         attributes['media'] = media
+        if media in media_languages :
+            attributes['language'] = media_languages[media]
+        else :
+            attributes['language'] = 'unknown'
         attributes['today_str'] = today_date
+        attributes['month'] = datetime.today().strftime("%B")
         attributes['message.indexBatch'] = i
         attributes['message.countBatch'] = num_spiders
         attributes['message.lastBatch'] = True if  i+1 == num_spiders else False
+
 
         df = pd.DataFrame(articles_list)
         df  = df.drop_duplicates(subset=['text_id'])
