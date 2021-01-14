@@ -1,5 +1,6 @@
-### Attention
-Due to unnoticed sync fight between Microsoft OneDrive and Github Desktop some code was scrambled. I tried to clean up the mess but there might still be some remnants left. 
+# DEPRECATED 
+
+Now use the following repository: [SAP Samples Data Intelligence Text Analysis](https://github.com/SAP-samples/data-intelligence-text-analysis)
 
 # Text Analysis Framework deployed on SAP Data Intelligence
 
